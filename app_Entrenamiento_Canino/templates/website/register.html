@@ -1,0 +1,392 @@
+<!-- app_Entrenamiento_Canino/templates/website/register.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .register-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            padding: 20px;
+        }
+        
+        .register-container {
+            background-color: white;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .register-header {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .register-header h1 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+        
+        .register-header p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0;
+        }
+        
+        .register-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 107, 77, 0.2);
+        }
+        
+        .form-control.error {
+            border-color: var(--color-danger);
+        }
+        
+        .error-message {
+            color: var(--color-danger);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .form-text {
+            color: var(--color-gray);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .back-to-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-primary);
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            color: var(--color-danger);
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            color: var(--color-success);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--color-gray);
+        }
+        
+        .login-link a {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        @media (max-width: 576px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-page">
+        <div class="register-container">
+            <div class="register-header">
+                <h1>CANIS ACADEMIA</h1>
+                <p>Crear Cuenta</p>
+            </div>
+            
+            <div class="register-body">
+                <!-- Mostrar mensajes de Django -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Formulario de Registro -->
+
+                <!-- Pega esto dentro de tu <form>, justo al principio -->
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Error detectado:</strong>
+                        <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="messages">
+                        <div class="alert alert-error">
+                            <strong>Por favor corrige los siguientes errores:</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_nombre">Nombre</label>
+                            <input type="text" id="id_nombre" name="nombre" class="form-control {% if form.nombre.errors %}error{% endif %}" 
+                                   placeholder="Tu nombre" required value="{{ form.nombre.value|default:'' }}">
+                            {% if form.nombre.errors %}
+                            <div class="error-message">{{ form.nombre.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_apellido">Apellido</label>
+                            <input type="text" id="id_apellido" name="apellido" class="form-control {% if form.apellido.errors %}error{% endif %}" 
+                                   placeholder="Tu apellido" required value="{{ form.apellido.value|default:'' }}">
+                            {% if form.apellido.errors %}
+                            <div class="error-message">{{ form.apellido.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Campo OBLIGATORIO para Django -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de Usuario (Para iniciar sesión) *</label>
+                        <input type="text" name="username" id="username" class="form-control" required>
+                        <small class="text-muted">Debe ser único. Letras, dígitos y @/./+/-/_ solamente.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_email">Correo Electrónico</label>
+                        <input type="email" id="id_email" name="email" class="form-control {% if form.email.errors %}error{% endif %}" 
+                               placeholder="tu@email.com" required value="{{ form.email.value|default:'' }}">
+                        {% if form.email.errors %}
+                        <div class="error-message">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_telefono">Teléfono</label>
+                        <input type="tel" id="id_telefono" name="telefono" class="form-control {% if form.telefono.errors %}error{% endif %}" 
+                               placeholder="(55) 1234-5678" required value="{{ form.telefono.value|default:'' }}">
+                        {% if form.telefono.errors %}
+                        <div class="error-message">{{ form.telefono.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_direccion">Dirección</label>
+                        <input type="text" id="id_direccion" name="direccion" class="form-control {% if form.direccion.errors %}error{% endif %}" 
+                               placeholder="Tu dirección completa" required value="{{ form.direccion.value|default:'' }}">
+                        {% if form.direccion.errors %}
+                        <div class="error-message">{{ form.direccion.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_password1">Contraseña</label>
+                        <input type="password" id="id_password1" name="password1" class="form-control {% if form.password1.errors %}error{% endif %}" 
+                               placeholder="Mínimo 8 caracteres" required>
+                        {% if form.password1.errors %}
+                        <div class="error-message">{{ form.password1.errors.0 }}</div>
+                        {% else %}
+                        <div class="form-text">La contraseña debe contener al menos 8 caracteres.</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_password2">Confirmar Contraseña</label>
+                        <input type="password" id="id_password2" name="password2" class="form-control {% if form.password2.errors %}error{% endif %}" 
+                               placeholder="Repite tu contraseña" required>
+                        {% if form.password2.errors %}
+                        <div class="error-message">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Crear Cuenta</button>
+                </form>
+                
+                <div class="login-link">
+                    <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+                </div>
+                
+                <div class="back-to-home">
+                    <a href="{% url 'home' %}">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    
+    <!-- JavaScript específico para registro -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.querySelector('form');
+            const password1 = document.getElementById('id_password1');
+            const password2 = document.getElementById('id_password2');
+            
+            // Validación en tiempo real para coincidencia de contraseñas
+            if (password1 && password2) {
+                password2.addEventListener('input', function() {
+                    if (password1.value !== password2.value) {
+                        password2.classList.add('error');
+                        showInputError(password2, 'Las contraseñas no coinciden');
+                    } else {
+                        password2.classList.remove('error');
+                        clearInputError(password2);
+                    }
+                });
+            }
+            
+            // Validación del formulario de registro
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    if (!validateForm(this)) {
+                        e.preventDefault();
+                    }
+                    
+                    // Validar que las contraseñas coincidan
+                    if (password1.value !== password2.value) {
+                        e.preventDefault();
+                        password2.classList.add('error');
+                        showInputError(password2, 'Las contraseñas no coinciden');
+                    }
+                });
+            }
+            
+            // Validación en tiempo real
+            const inputs = document.querySelectorAll('input[required]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        showInputError(this, 'Este campo es obligatorio');
+                    } else {
+                        clearInputError(this);
+                    }
+                });
+            });
+        });
+        
+        // Funciones de validación
+        function validateForm(form) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('input[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    showInputError(field, 'Este campo es obligatorio');
+                    isValid = false;
+                } else {
+                    clearInputError(field);
+                }
+            });
+            
+            return isValid;
+        }
+        
+        function showInputError(input, message) {
+            clearInputError(input);
+            input.classList.add('error');
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            input.parentNode.appendChild(errorDiv);
+        }
+        
+        function clearInputError(input) {
+            input.classList.remove('error');
+            const errorDiv = input.parentNode.querySelector('.error-message');
+            if (errorDiv && !errorDiv.classList.contains('django-error')) {
+                errorDiv.remove();
+            }
+        }
+    </script>
+</body>
+</html>

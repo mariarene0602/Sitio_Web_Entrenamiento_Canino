@@ -1,0 +1,90 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Entrenadores{% endblock %}
+{% block page_subtitle %}Equipo de profesionales{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_entrenador' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Entrenador
+</a>
+{% endblock %}
+
+{% block card_icon %}user-tie{% endblock %}
+{% block card_title %}Lista de Entrenadores (Total: {{ entrenadores|length }}){% endblock %}
+
+{% block card_content %}
+{% if entrenadores %}
+<div class="table-responsive">
+    <table class="table admin-table align-middle">
+        <thead>
+            <tr>
+                <th style="width: 80px;">Foto</th>
+                <th>Nombre y Título</th>
+                <th>Especialidad</th>
+                <th>Contacto</th>
+                <th>Disponibilidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entrenador in entrenadores %}
+            <tr>
+                <td>
+                    {% if entrenador.foto %}
+                        <img src="{{ entrenador.foto.url }}" alt="{{ entrenador.nombre }}" 
+                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #999;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong>{{ entrenador.nombre }} {{ entrenador.apellido }}</strong><br>
+                    <small class="text-primary">{{ entrenador.titulo|default:"Entrenador" }}</small>
+                </td>
+                <td>
+                    <span class="badge bg-light text-dark border">{{ entrenador.especialidad }}</span>
+                    <br>
+                    <small class="text-muted">{{ entrenador.experiencia }} años exp.</small>
+                </td>
+                <td>
+                    <div class="d-flex flex-column text-muted small">
+                        <span><i class="fas fa-envelope me-1"></i> {{ entrenador.email }}</span>
+                        <span><i class="fas fa-phone me-1"></i> {{ entrenador.telefono }}</span>
+                    </div>
+                </td>
+                <td>
+                    {% if entrenador.disponible %}
+                        <span class="badge bg-success">Disponible</span>
+                        {% if entrenador.horario_disponibilidad %}
+                        <br><small class="text-muted" style="font-size: 0.7rem;">{{ entrenador.horario_disponibilidad|truncatechars:15 }}</small>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-secondary">No Disponible</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_entrenador' entrenador.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_entrenador' entrenador.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-user-tie"></i>
+    <h4>No hay entrenadores registrados</h4>
+    <p>Agrega a los miembros de tu equipo.</p>
+    <a href="{% url 'agregar_entrenador' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Registrar Primer Entrenador
+    </a>
+</div>
+{% endif %}
+{% endblock %}

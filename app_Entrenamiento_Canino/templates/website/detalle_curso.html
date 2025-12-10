@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ curso.nombre }} - CANIS Academia</title>
+    
+    <!-- Tus estilos -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes y Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .course-detail-section {
+            padding: 60px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .course-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .course-gallery img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            object-fit: cover;
+            height: 400px;
+        }
+        
+        .course-info-detail h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .course-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-level { background-color: #e3f2fd; color: #1976d2; }
+        .badge-duration { background-color: #e8f5e9; color: #2e7d32; }
+        
+        .course-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #8b6b4d; /* Tu color primario */
+            margin-bottom: 20px;
+        }
+        
+        .course-description {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+        }
+        
+        .features-list {
+            margin-bottom: 30px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features-list li i {
+            color: #28a745;
+            margin-right: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-buy {
+            background: linear-gradient(135deg, #8b6b4d 0%, #a07d5a 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 107, 77, 0.3);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .course-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main>
+        <!-- Encabezado simple -->
+        <div style="background: #2c3e50; padding: 40px 0; text-align: center; color: white;">
+            <p style="margin: 0; opacity: 0.8;">Detalle del Curso</p>
+        </div>
+
+        <section class="course-detail-section">
+            <div class="course-container">
+                <!-- Columna Izquierda: Imagen -->
+                <div class="course-gallery">
+                    {% if curso.imagen %}
+                        <img src="{{ curso.imagen.url }}" alt="{{ curso.nombre }}">
+                    {% else %}
+                        src="{% static 'website/images/default-course.jpg' %}"
+                    {% endif %}
+                </div>
+
+                <!-- Columna Derecha: Información -->
+                <div class="course-info-detail">
+                    <h1>{{ curso.nombre }}</h1>
+                    
+                    <div class="course-badges">
+                        <span class="badge badge-level"><i class="fas fa-layer-group"></i> {{ curso.nivel|title }}</span>
+                        <span class="badge badge-duration"><i class="fas fa-clock"></i> {{ curso.duracion }} Horas</span>
+                    </div>
+
+                    <div class="course-price">
+                        ${{ curso.precio }} MXN
+                    </div>
+
+                    <div class="course-description">
+                        <p>{{ curso.descripcion }}</p>
+                    </div>
+
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Acceso inmediato al contenido</li>
+                        <li><i class="fas fa-check-circle"></i> Certificado al finalizar</li>
+                        <li><i class="fas fa-check-circle"></i> Soporte con entrenadores</li>
+                        <li><i class="fas fa-check-circle"></i> Garantía de satisfacción</li>
+                    </ul>
+
+                    <div class="action-buttons">
+                        <!-- Botón que lleva a comprar este curso específico -->
+                        <a href="{% url 'comprar_curso' %}?id={{ curso.id }}" class="btn-buy">
+                            <i class="fas fa-shopping-cart"></i> Inscribirme Ahora
+                        </a>
+                    </div>
+                    
+                    <a href="{% url 'cursos' %}" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Volver a Cursos
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    {% include 'website/partials/footer.html' %}
+</body>
+</html>

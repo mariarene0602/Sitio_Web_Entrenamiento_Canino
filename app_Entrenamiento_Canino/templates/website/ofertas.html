@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">OFERTAS ESPECIALES</h1>
+                <p class="page-subtitle">Aprovecha nuestros descuentos por tiempo limitado y entrena a tu perro con los mejores.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / <span>Ofertas</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="offers-section">
+            <div class="container">
+                <div class="offers-grid" id="offers-container">
+                    <!-- OFERTAS DINÁMICAS DE DJANGO -->
+                    {% for oferta in ofertas %}
+                    <div class="offer-card" 
+                        data-id="{{ oferta.id }}"
+                        data-fecha-fin="{{ oferta.fecha_limite|date:'Y-m-d' }}"
+                        data-porcentaje="{{ oferta.porcentaje_descuento }}">
+                        
+                        <div class="offer-badge">{{ oferta.porcentaje_descuento }}% OFF</div>
+                        
+                        <!-- Imagen genérica porque Oferta no tiene foto -->
+                        <div class="offer-image">
+                            {% if oferta.imagen %}
+                                <!-- Si tiene imagen propia, la muestra -->
+                                <img src="{{ oferta.imagen.url }}" alt="Oferta {{ oferta.codigo }}">
+                            {% else %}
+                                <!-- Si no, muestra la imagen por defecto -->
+                                <img src="{% static 'website/images/promo-default.jpg' %}" 
+                                    alt="Oferta Especial"
+                                    onerror="this.src='https://via.placeholder.com/400x200?text=OFERTA'">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="offer-content">
+                            <!-- Usamos el código como título -->
+                            <h3>CUPÓN: {{ oferta.codigo }}</h3>
+                            <p>{{ oferta.descripcion }}</p>
+                            
+                            <div class="offer-details">
+                                <div class="offer-code">
+                                    <strong>Código:</strong>
+                                    <span class="code" style="font-family: monospace; font-size: 1.2em; background: #f0f0f0; padding: 2px 8px; border-radius: 4px;">{{ oferta.codigo }}</span>
+                                </div>
+                                <div class="offer-expiry">
+                                    <i class="fas fa-clock"></i>
+                                    {% if oferta.fecha_limite %}
+                                        Válido hasta: {{ oferta.fecha_limite|date:"d/m/Y" }}
+                                    {% else %}
+                                        ¡Por tiempo limitado!
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="offer-actions">
+                                <!-- Lleva a cursos para que usen el cupón -->
+                                <a href="{% url 'cursos' %}" class="btn btn-primary">
+                                Ver Cursos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-offers">
+                        <i class="fas fa-tag"></i>
+                        <h3>No hay ofertas disponibles en este momento</h3>
+                        <p>Regresa pronto para ver nuestras promociones especiales.</p>
+                        <a href="{% url 'cursos' %}" class="btn btn-primary">Ver Todos los Cursos</a>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="offers-cta">
+                    <div class="cta-card">
+                        <div class="cta-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3>¿Eres cliente frecuente?</h3>
+                        <p>Obtén descuentos exclusivos y promociones especiales al comprar múltiples cursos.</p>
+                        <a href="#" class="btn btn-primary" id="contact-frequent">Contáctanos</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter-section">
+            <div class="container">
+                <div class="newsletter-content">
+                    <h2>¡No te pierdas ninguna oferta!</h2>
+                    <p>Suscríbete a nuestro newsletter y recibe las mejores promociones directamente en tu email.</p>
+                    <form class="newsletter-form" id="newsletterForm" method="POST" action="{% url 'suscribir_newsletter' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="email" name="email" placeholder="Tu correo electrónico" required>
+                            <button type="submit" class="btn btn-primary">Suscribirme</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer Django -->
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+</body>
+</html>

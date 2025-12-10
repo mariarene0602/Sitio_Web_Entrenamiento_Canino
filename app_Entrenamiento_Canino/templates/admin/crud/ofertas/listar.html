@@ -1,0 +1,86 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Ofertas{% endblock %}
+{% block page_subtitle %}Gestión de cupones y descuentos{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_oferta' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nueva Oferta
+</a>
+{% endblock %}
+
+{% block card_icon %}tag{% endblock %}
+{% block card_title %}Lista de Ofertas (Total: {{ ofertas|length }}){% endblock %}
+
+{% block card_content %}
+{% if ofertas %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th style="width: 80px;">Img</th>
+                <th>Código</th>
+                <th>Curso / Descripción</th>
+                <th>Descuento</th>
+                <th>Válido Hasta</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for oferta in ofertas %}
+            <tr>
+                <td>{{ oferta.id }}</td>
+                <td>
+                    <code style="font-size: 1.1em; color: #d63384;">{{ oferta.codigo }}</code>
+                </td>
+                <td>
+                    {{ oferta.descripcion|truncatechars:40 }}
+                </td>
+                <td>
+                    <span class="badge bg-danger" style="font-size: 0.9em;">
+                        -{{ oferta.porcentaje_descuento }}%
+                    </span>
+                </td>
+                <td>
+                    {% if oferta.fecha_limite %}
+                        {{ oferta.fecha_limite|date:"d/m/Y" }}
+                    {% else %}
+                        <span class="text-muted fst-italic">Tiempo Indefinido</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if oferta.activo %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <!-- Botón Editar -->
+                    <a href="{% url 'actualizar_oferta' oferta.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    
+                    <!-- Botón Eliminar -->
+                    <a href="{% url 'borrar_oferta' oferta.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-tag"></i>
+    <h4>No hay ofertas registradas</h4>
+    <p>Crea cupones de descuento para tus clientes.</p>
+    <a href="{% url 'agregar_oferta' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Crear Primera Oferta
+    </a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,632 @@
+<!-- app_Entrenamiento_Canino/templates/website/agendar-sesion.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Sesión - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">AGENDAR SESIÓN</h1>
+                <p class="page-subtitle">Programa las sesiones de entrenamiento para tu perro.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / 
+                    <a href="{% url 'perfil' %}">Mi Perfil</a> / 
+                    <span>Agendar Sesión</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="schedule-section">
+            <div class="container">
+                <div class="schedule-steps">
+                    <div class="step active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Seleccionar Curso</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Elegir Entrenador</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Seleccionar Fecha</span>
+                    </div>
+                    <div class="step" data-step="4">
+                        <span class="step-number">4</span>
+                        <span class="step-label">Confirmar</span>
+                    </div>
+                </div>
+
+                <!-- Paso 1: Seleccionar Curso -->
+                <div class="schedule-step active" id="step-1">
+                    <h2>Selecciona el Curso</h2>
+                    <p>Elige el curso para el cual quieres agendar sesiones.</p>
+                    
+                    <div class="user-courses-selection" id="user-courses-selection">
+                        <!-- CURSOS DEL USUARIO DESDE DJANGO -->
+                        {% if compras %}
+                            {% for compra in compras %}
+                            <div class="course-select-card" data-id="{{ compra.curso.id }}">
+                                <div class="course-select-image">
+                                    {% if compra.curso.imagen %}
+                                        <img src="{{ compra.curso.imagen.url }}" 
+                                             alt="{{ compra.curso.nombre }}"
+                                             onerror="this.onerror=null; this.src='{% static 'website/images/default-course.jpg' %}'">
+                                    {% else %}
+                                        <img src="{% static 'website/images/default-course.jpg' %}" 
+                                             alt="{{ compra.curso.nombre }}">
+                                    {% endif %}
+                                </div>
+                                <div class="course-select-info">
+                                    <h4>{{ compra.curso.nombre }}</h4>
+                                    <p>{{ compra.curso.descripcion|truncatewords:20 }}</p>
+                                    <div class="course-meta">
+                                        <span><i class="fas fa-clock"></i> {{ compra.curso.duracion }}</span>
+                                        <span><i class="fas fa-chart-line"></i> {{ compra.curso.nivel }}</span>
+                                        <span><i class="fas fa-calendar"></i> {{ compra.fecha_compra|date:"d/m/Y" }}</span>
+                                    </div>
+                                </div>
+                                <div class="course-select-action">
+                                    <button class="btn btn-outline select-course-btn">Seleccionar</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-courses">
+                                <i class="fas fa-graduation-cap"></i>
+                                <h3>No tienes cursos disponibles</h3>
+                                <p>Compra un curso primero para poder agendar sesiones.</p>
+                                <a href="{% url 'cursos' %}" class="btn btn-primary">Ver Cursos</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="step-actions">
+                        <a href="{% url 'perfil' %}" class="btn btn-outline">Cancelar</a>
+                        <button class="btn btn-primary next-step" data-next="2" disabled>Continuar</button>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Elegir Entrenador -->
+                <div class="schedule-step" id="step-2">
+                    <h2>Selecciona un Entrenador</h2>
+                    <p>Elige el entrenador que prefieras para las sesiones.</p>
+                    
+                    <div class="trainers-selection" id="trainers-selection">
+                        <!-- ENTRENADORES DESDE DJANGO -->
+                        {% for entrenador in entrenadores %}
+                        <div class="trainer-card" data-id="{{ entrenador.id }}">
+                            <div class="trainer-image">
+                                {% if entrenador.imagen %}
+                                    <img src="{{ entrenador.imagen.url }}" 
+                                         alt="{{ entrenador.nombre }} {{ entrenador.apellido }}"
+                                         onerror="this.onerror=null; this.src='{% static 'website/images/trainer-default.jpg' %}'">
+                                {% else %}
+                                    <img src="{% static 'website/images/trainer-default.jpg' %}" 
+                                         alt="{{ entrenador.nombre }} {{ entrenador.apellido }}">
+                                {% endif %}
+                            </div>
+                            <div class="trainer-info">
+                                <h4>{{ entrenador.nombre }} {{ entrenador.apellido }}</h4>
+                                <p class="specialty">{{ entrenador.especialidad }}</p>
+                                <div class="trainer-meta">
+                                    <span class="experience">
+                                        <i class="fas fa-briefcase"></i> 
+                                        Desde {{ entrenador.fecha_contratacion|date:"Y" }}
+                                    </span>
+                                    <span class="contact">
+                                        <i class="fas fa-phone"></i> {{ entrenador.telefono }}
+                                    </span>
+                                </div>
+                                <p class="trainer-bio">
+                                    Especialista en {{ entrenador.especialidad.lower }} con amplia experiencia en entrenamiento canino.
+                                </p>
+                            </div>
+                            <div class="trainer-action">
+                                <button class="btn btn-outline select-trainer-btn">Seleccionar</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-outline prev-step" data-prev="1">Anterior</button>
+                        <button class="btn btn-primary next-step" data-next="3" disabled>Continuar</button>
+                    </div>
+                </div>
+
+                <!-- Paso 3: Seleccionar Fecha y Hora -->
+                <div class="schedule-step" id="step-3">
+                    <h2>Selecciona Fecha y Hora</h2>
+                    <p>Elige la fecha y hora que mejor se adapten a tu agenda.</p>
+                    
+                    <div class="datetime-selection">
+                        <div class="date-selection">
+                            <h3>Selecciona una Fecha</h3>
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <button class="nav-btn prev-month">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span class="current-month" id="current-month"></span>
+                                    <button class="nav-btn next-month">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="calendar" id="calendar">
+                                    <!-- Calendario se generará dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="time-selection">
+                            <h3>Horarios Disponibles</h3>
+                            <div class="time-slots" id="time-slots">
+                                <div class="no-date-selected">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <p>Selecciona una fecha para ver los horarios disponibles</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-outline prev-step" data-prev="2">Anterior</button>
+                        <button class="btn btn-primary next-step" data-next="4" disabled>Continuar</button>
+                    </div>
+                </div>
+
+                <!-- Paso 4: Confirmación -->
+                <div class="schedule-step" id="step-4">
+                    <h2>Confirmar Sesión</h2>
+                    <p>Revisa los detalles de tu sesión antes de confirmar.</p>
+                    
+                    <div class="confirmation-details">
+                        <div class="detail-card">
+                            <h3>Detalles de la Sesión</h3>
+                            <div class="detail-item">
+                                <strong>Curso:</strong>
+                                <span id="confirm-course"></span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Entrenador:</strong>
+                                <span id="confirm-trainer"></span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Fecha:</strong>
+                                <span id="confirm-date"></span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Hora:</strong>
+                                <span id="confirm-time"></span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Duración:</strong>
+                                <span>60 minutos</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Ubicación:</strong>
+                                <span>Av. Canina 123, CDMX o Domicilio (según curso)</span>
+                            </div>
+                        </div>
+
+                        <div class="instructions-card">
+                            <h3>Instrucciones Importantes</h3>
+                            <ul>
+                                <li>Llega 10 minutos antes de tu sesión</li>
+                                <li>Trae las vacunas de tu perro al día</li>
+                                <li>No alimentes a tu perro 2 horas antes de la sesión</li>
+                                <li>Trae premios que le gusten a tu perro</li>
+                                <li>Usa ropa cómoda para entrenar</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form id="appointment-form" method="POST" action="{% url 'procesar_cita' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="curso-id" name="curso_id">
+                        <input type="hidden" id="entrenador-id" name="entrenador_id">
+                        <input type="hidden" id="fecha-cita" name="fecha">
+                        <input type="hidden" id="hora-cita" name="hora">
+                        <input type="hidden" id="perro-id" name="perro_id" value="{{ perro.id|default:'' }}">
+                        <textarea id="notas-cita" name="notas" style="display: none;"></textarea>
+                        
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-outline prev-step" data-prev="3">Anterior</button>
+                            <button type="submit" class="btn btn-primary" id="confirm-appointment">Confirmar Sesión</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Django -->
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    
+    <!-- JavaScript específico para agendar sesiones -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario está autenticado
+            {% if not user.is_authenticated %}
+                alert('Debes iniciar sesión para agendar una sesión');
+                window.location.href = "{% url 'login' %}?next={% url 'agendar_sesion' %}";
+                return;
+            {% endif %}
+
+            // Variables globales
+            let selectedCourse = null;
+            let selectedTrainer = null;
+            let selectedDate = null;
+            let selectedTime = null;
+            let currentMonth = new Date().getMonth();
+            let currentYear = new Date().getFullYear();
+
+            // Datos de Django
+            const cursosData = [
+                {% for compra in compras %}
+                {
+                    id: {{ compra.curso.id }},
+                    nombre: "{{ compra.curso.nombre|escapejs }}",
+                    descripcion: "{{ compra.curso.descripcion|escapejs }}",
+                    duracion: "{{ compra.curso.duracion|escapejs }}",
+                    nivel: "{{ compra.curso.nivel|escapejs }}",
+                    imagen: "{% if compra.curso.imagen %}{{ compra.curso.imagen.url }}{% else %}{% static 'website/images/default-course.jpg' %}{% endif %}",
+                    fecha_compra: "{{ compra.fecha_compra|date:'d/m/Y' }}"
+                },
+                {% endfor %}
+            ];
+
+            const entrenadoresData = [
+                {% for entrenador in entrenadores %}
+                {
+                    id: {{ entrenador.id }},
+                    nombre: "{{ entrenador.nombre|escapejs }} {{ entrenador.apellido|escapejs }}",
+                    especialidad: "{{ entrenador.especialidad|escapejs }}",
+                    telefono: "{{ entrenador.telefono|escapejs }}",
+                    fecha_contratacion: "{{ entrenador.fecha_contratacion|date:'Y' }}",
+                    imagen: "{% if entrenador.imagen %}{{ entrenador.imagen.url }}{% else %}{% static 'website/images/trainer-default.jpg' %}{% endif %}"
+                },
+                {% endfor %}
+            ];
+
+            // Inicializar proceso de agendamiento
+            initializeScheduling();
+
+            function initializeScheduling() {
+                setupEventListeners();
+                generateCalendar(currentMonth, currentYear);
+            }
+
+            function setupEventListeners() {
+                // Selección de cursos
+                document.querySelectorAll('.select-course-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const courseCard = this.closest('.course-select-card');
+                        const courseId = parseInt(courseCard.getAttribute('data-id'));
+                        
+                        // Remover selección anterior
+                        document.querySelectorAll('.course-select-card').forEach(card => {
+                            card.classList.remove('selected');
+                        });
+                        
+                        // Agregar selección actual
+                        courseCard.classList.add('selected');
+                        
+                        selectedCourse = cursosData.find(c => c.id === courseId);
+                        
+                        // Habilitar siguiente paso
+                        document.querySelector('#step-1 .next-step').disabled = false;
+                    });
+                });
+
+                // Selección de entrenadores
+                document.querySelectorAll('.select-trainer-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const trainerCard = this.closest('.trainer-card');
+                        const trainerId = parseInt(trainerCard.getAttribute('data-id'));
+                        
+                        // Remover selección anterior
+                        document.querySelectorAll('.trainer-card').forEach(card => {
+                            card.classList.remove('selected');
+                        });
+                        
+                        // Agregar selección actual
+                        trainerCard.classList.add('selected');
+                        
+                        selectedTrainer = entrenadoresData.find(t => t.id === trainerId);
+                        
+                        // Habilitar siguiente paso
+                        document.querySelector('#step-2 .next-step').disabled = false;
+                    });
+                });
+
+                // Navegación entre pasos
+                document.querySelectorAll('.next-step').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const nextStep = this.getAttribute('data-next');
+                        goToStep(nextStep);
+                    });
+                });
+
+                document.querySelectorAll('.prev-step').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const prevStep = this.getAttribute('data-prev');
+                        goToStep(prevStep);
+                    });
+                });
+
+                // Navegación del calendario
+                document.querySelector('.prev-month').addEventListener('click', function() {
+                    currentMonth--;
+                    if (currentMonth < 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    }
+                    generateCalendar(currentMonth, currentYear);
+                });
+
+                document.querySelector('.next-month').addEventListener('click', function() {
+                    currentMonth++;
+                    if (currentMonth > 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    }
+                    generateCalendar(currentMonth, currentYear);
+                });
+
+                // Envío del formulario
+                document.getElementById('appointment-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    confirmAppointment();
+                });
+            }
+
+            function generateCalendar(month, year) {
+                const calendar = document.getElementById('calendar');
+                const monthNames = [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+
+                // Actualizar encabezado del calendario
+                document.getElementById('current-month').textContent = `${monthNames[month]} ${year}`;
+
+                // Obtener primer día del mes y cantidad de días
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDay = firstDay.getDay();
+
+                // Generar días de la semana
+                const weekdays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                let calendarHTML = '<div class="calendar-week">';
+                
+                weekdays.forEach(day => {
+                    calendarHTML += `<div class="calendar-weekday">${day}</div>`;
+                });
+                calendarHTML += '</div><div class="calendar-days">';
+
+                // Días vacíos al inicio
+                for (let i = 0; i < startingDay; i++) {
+                    calendarHTML += '<div class="calendar-day empty"></div>';
+                }
+
+                // Días del mes
+                const today = new Date();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const isToday = date.toDateString() === today.toDateString();
+                    const isPast = date < today && !isToday;
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    
+                    let dayClass = 'calendar-day';
+                    if (isToday) dayClass += ' today';
+                    if (isPast) dayClass += ' past';
+                    if (isWeekend) dayClass += ' weekend';
+                    
+                    calendarHTML += `
+                        <div class="${dayClass}" data-date="${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">
+                            ${day}
+                        </div>
+                    `;
+                }
+
+                calendarHTML += '</div>';
+                calendar.innerHTML = calendarHTML;
+
+                // Event listeners para días del calendario
+                document.querySelectorAll('.calendar-day:not(.empty):not(.past)').forEach(day => {
+                    day.addEventListener('click', function() {
+                        // Remover selección anterior
+                        document.querySelectorAll('.calendar-day').forEach(d => {
+                            d.classList.remove('selected');
+                        });
+                        
+                        // Agregar selección actual
+                        this.classList.add('selected');
+                        
+                        selectedDate = this.getAttribute('data-date');
+                        loadAvailableTimeSlots();
+                    });
+                });
+            }
+
+            function loadAvailableTimeSlots() {
+                if (!selectedDate || !selectedTrainer) return;
+
+                const timeSlotsContainer = document.getElementById('time-slots');
+                
+                // Verificar si es fin de semana
+                const dateObj = new Date(selectedDate);
+                const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+                
+                // Horarios disponibles (ajustar según día)
+                const availableSlots = isWeekend 
+                    ? ['10:00', '11:00', '12:00']  // Menos horarios los fines de semana
+                    : ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
+
+                timeSlotsContainer.innerHTML = `
+                    <div class="time-slots-header">
+                        <h4>Horarios disponibles para ${formatDate(selectedDate)}</h4>
+                        ${isWeekend ? '<p class="weekend-note"><i class="fas fa-info-circle"></i> Horario reducido de fin de semana</p>' : ''}
+                    </div>
+                    <div class="time-slots-grid">
+                        ${availableSlots.map(slot => `
+                            <div class="time-slot" data-time="${slot}">
+                                ${slot}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Event listeners para horarios
+                document.querySelectorAll('.time-slot').forEach(slot => {
+                    slot.addEventListener('click', function() {
+                        // Remover selección anterior
+                        document.querySelectorAll('.time-slot').forEach(s => {
+                            s.classList.remove('selected');
+                        });
+                        
+                        // Agregar selección actual
+                        this.classList.add('selected');
+                        
+                        selectedTime = this.getAttribute('data-time');
+                        
+                        // Habilitar siguiente paso
+                        document.querySelector('#step-3 .next-step').disabled = false;
+                    });
+                });
+            }
+
+            function goToStep(stepNumber) {
+                // Validar antes de avanzar
+                if (stepNumber > 1 && !validateStep(stepNumber - 1)) {
+                    alert('Por favor completa la información requerida');
+                    return;
+                }
+
+                // Ocultar todos los pasos
+                document.querySelectorAll('.schedule-step').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Mostrar paso seleccionado
+                document.getElementById(`step-${stepNumber}`).classList.add('active');
+
+                // Actualizar indicadores de pasos
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                    if (parseInt(step.getAttribute('data-step')) <= stepNumber) {
+                        step.classList.add('active');
+                    }
+                });
+
+                // Si vamos al paso 4, actualizar detalles de confirmación
+                if (stepNumber === '4') {
+                    updateConfirmationDetails();
+                }
+            }
+
+            function validateStep(stepNumber) {
+                switch(stepNumber) {
+                    case 1:
+                        return !!selectedCourse;
+                    case 2:
+                        return !!selectedTrainer;
+                    case 3:
+                        return !!selectedDate && !!selectedTime;
+                    default:
+                        return true;
+                }
+            }
+
+            function updateConfirmationDetails() {
+                document.getElementById('confirm-course').textContent = selectedCourse.nombre;
+                document.getElementById('confirm-trainer').textContent = selectedTrainer.nombre;
+                document.getElementById('confirm-date').textContent = formatDate(selectedDate);
+                document.getElementById('confirm-time').textContent = selectedTime;
+                
+                // Llenar campos ocultos del formulario
+                document.getElementById('curso-id').value = selectedCourse.id;
+                document.getElementById('entrenador-id').value = selectedTrainer.id;
+                document.getElementById('fecha-cita').value = selectedDate;
+                document.getElementById('hora-cita').value = selectedTime;
+                document.getElementById('notas-cita').value = `Sesión para el curso: ${selectedCourse.nombre}. Entrenador: ${selectedTrainer.nombre}`;
+            }
+
+            function confirmAppointment() {
+                const form = document.getElementById('appointment-form');
+                const submitBtn = document.getElementById('confirm-appointment');
+                
+                // Deshabilitar botón y mostrar carga
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                
+                // Enviar formulario
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('¡Sesión agendada exitosamente!', 'success');
+                        setTimeout(() => {
+                            window.location.href = "{% url 'perfil' %}";
+                        }, 2000);
+                    } else {
+                        showNotification(data.error || 'Hubo un error al agendar la sesión', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Confirmar Sesión';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Hubo un error al agendar la sesión', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Confirmar Sesión';
+                });
+            }
+
+            // Funciones auxiliares
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-MX', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            function showNotification(message, type = 'info') {
+                alert(message); // Puedes reemplazar esto con un sistema de notificaciones más bonito
+            }
+        });
+    </script>
+</body>
+</html>

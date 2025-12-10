@@ -1,0 +1,86 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Compra{% endblock %}
+{% block page_subtitle %}Modificar detalles de la transacción #{{ compra.id }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_compras' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_compra' compra.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Compra
+</a>
+{% endblock %}
+
+{% block card_icon %}edit{% endblock %}
+{% block card_title %}Detalles de la Compra{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_compra' compra.id %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Cliente (Solo lectura)</label>
+            <input type="text" class="form-control admin-form-control" 
+                   value="{{ compra.cliente.nombre }} {{ compra.cliente.apellido }}" disabled>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Curso (Solo lectura)</label>
+            <input type="text" class="form-control admin-form-control" 
+                   value="{{ compra.curso.nombre }}" disabled>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="fecha_compra" class="form-label">Fecha de Compra</label>
+            <!-- CORRECCIÓN AQUÍ: Solo 'Y-m-d', sin horas -->
+            <input type="date" class="form-control admin-form-control" id="fecha_compra" name="fecha_compra" 
+                   value="{{ compra.fecha_compra|date:'Y-m-d' }}">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="precio_final" class="form-label">Monto Final ($)</label>
+            <!-- Usamos precio_final según tu modelo nuevo -->
+            <input type="number" step="0.01" class="form-control admin-form-control" id="precio_final" name="precio_final" 
+                   value="{{ compra.precio_final }}">
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="estado" class="form-label">Estado de la Compra</label>
+        <select class="form-select admin-form-control" id="estado" name="estado">
+            <option value="pendiente" {% if compra.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="completado" {% if compra.estado == 'completado' %}selected{% endif %}>Completado</option>
+            <option value="cancelado" {% if compra.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+        </select>
+    </div>
+
+    <!-- Información adicional informativa -->
+    <div class="alert alert-light border">
+        <h6><i class="fas fa-info-circle"></i> Detalles Financieros</h6>
+        <div class="row text-muted small">
+            <div class="col-md-4">
+                Precio Base: ${{ compra.precio_base }}
+            </div>
+            <div class="col-md-4">
+                Descuento: -${{ compra.descuento_aplicado }}
+            </div>
+            <div class="col-md-4">
+                <strong>Total a Pagar: ${{ compra.precio_final }}</strong>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_compras' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!-- app_Entrenamiento_Canino/templates/admin/footer.html -->
+<footer class="admin-footer">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5><i class="fas fa-paw"></i> CANIS Academia</h5>
+                <p class="mb-0">Sistema de Administración CRUD</p>
+                <p class="text-muted small mt-2">
+                    <i class="fas fa-user"></i> 
+                    {{ user.username }} | 
+                    {% if user.is_superuser %}
+                    <span class="text-warning"><i class="fas fa-crown"></i> Superadmin</span>
+                    {% elif user.is_staff %}
+                    <span class="text-info"><i class="fas fa-user-shield"></i> Staff</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="col-md-6 text-md-end">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm me-2" target="_blank">
+                        <i class="fas fa-home"></i> Sitio Web
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-outline-light btn-sm me-2" target="_blank">
+                        <i class="fas fa-cog"></i> Django Admin
+                    </a>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </div>
+                <p class="text-muted small mt-3 mb-0">
+                    &copy; {% now "Y" %} CANIS Academia. Sistema CRUD v1.0
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,255 @@
+<!-- app_Entrenamiento_Canino/templates/admin/base_site.html -->
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | CANIS ACADEMIA Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}" style="display: flex; align-items: center; text-decoration: none;">
+        <i class="fas fa-paw" style="margin-right: 12px; color: #8b6b4d;"></i>
+        <span style="font-family: 'Playfair Display', serif; font-weight: 700;">
+            CANIS ACADEMIA
+            <small style="font-size: 0.8em; color: #666; font-weight: 400;">Panel de Administración</small>
+        </span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* Importar fuentes */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap');
+    
+    :root {
+        --primary-brown: #8b6b4d;
+        --primary-dark: #2c3e50;
+        --primary-light: #a07d5a;
+        --accent-blue: #3498db;
+    }
+    
+    /* Header */
+    #header {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, #34495e 100%) !important;
+        color: white !important;
+        padding: 0 20px !important;
+    }
+    
+    #branding h1 {
+        font-family: 'Playfair Display', serif !important;
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+    }
+    
+    #branding h1 a {
+        color: white !important;
+        text-decoration: none !important;
+    }
+    
+    #branding h1 a:hover {
+        color: #f0f0f0 !important;
+    }
+    
+    /* Links en header */
+    #user-tools {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 500 !important;
+    }
+    
+    #user-tools a {
+        color: white !important;
+        border-bottom: 1px solid rgba(255,255,255,0.3) !important;
+    }
+    
+    #user-tools a:hover {
+        color: #f0f0f0 !important;
+        border-bottom-color: white !important;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: #f8f9fa !important;
+        border-bottom: 1px solid #dee2e6 !important;
+        padding: 12px 20px !important;
+        font-family: 'Montserrat', sans-serif !important;
+    }
+    
+    .breadcrumbs a {
+        color: var(--primary-brown) !important;
+        font-weight: 500 !important;
+    }
+    
+    .breadcrumbs a:hover {
+        color: var(--primary-light) !important;
+    }
+    
+    /* Botones */
+    .button, input[type="submit"], input[type="button"], .submit-row input {
+        background: linear-gradient(135deg, var(--primary-brown) 0%, var(--primary-light) 100%) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+        font-family: 'Montserrat', sans-serif !important;
+        transition: all 0.3s !important;
+    }
+    
+    .button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+        background: linear-gradient(135deg, #7a5c42 0%, var(--primary-brown) 100%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Campos de formulario */
+    .vTextField, .vLargeTextField, .vURLField, select {
+        border: 2px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        font-family: 'Montserrat', sans-serif !important;
+        transition: all 0.3s !important;
+    }
+    
+    .vTextField:focus, .vLargeTextField:focus, .vURLField:focus, select:focus {
+        border-color: var(--primary-brown) !important;
+        box-shadow: 0 0 0 3px rgba(139, 107, 77, 0.2) !important;
+        outline: none !important;
+    }
+    
+    /* Tablas */
+    #changelist {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin: 20px;
+    }
+    
+    #changelist table {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    #changelist table thead th {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, #34495e 100%) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        padding: 15px !important;
+    }
+    
+    #changelist table tbody td {
+        padding: 12px 15px !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+    }
+    
+    #changelist table tbody tr:hover {
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Sidebar */
+    #content-related {
+        background: #f8f9fa;
+        border-radius: 12px;
+        margin-left: 20px;
+        padding: 20px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    #content-related h3 {
+        color: var(--primary-dark);
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        border-bottom: 2px solid var(--primary-brown);
+        padding-bottom: 10px;
+    }
+    
+    /* Dashboard */
+    .dashboard #content {
+        padding: 30px !important;
+    }
+    
+    .dashboard .module {
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        margin-bottom: 25px !important;
+        overflow: hidden;
+    }
+    
+    .dashboard .module h2 {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, #34495e 100%) !important;
+        color: white !important;
+        padding: 20px !important;
+        font-family: 'Playfair Display', serif !important;
+        font-weight: 700 !important;
+        font-size: 1.3rem !important;
+    }
+    
+    .dashboard .module table {
+        margin: 0 !important;
+    }
+    
+    /* Mensajes */
+    .messagelist {
+        margin: 20px !important;
+    }
+    
+    .messagelist li {
+        border-radius: 8px !important;
+        margin-bottom: 15px !important;
+        padding: 15px 20px !important;
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Paginación */
+    .pagination {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    
+    /* Footer */
+    #footer {
+        background: #f8f9fa !important;
+        border-top: 1px solid #dee2e6 !important;
+        padding: 25px !important;
+        text-align: center !important;
+        color: #666 !important;
+        font-family: 'Montserrat', sans-serif !important;
+        margin-top: 40px !important;
+    }
+    
+    #footer p {
+        margin: 0 0 10px 0 !important;
+    }
+    
+    #footer a {
+        color: var(--primary-brown) !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        margin: 0 10px !important;
+    }
+    
+    #footer a:hover {
+        color: var(--primary-light) !important;
+        text-decoration: underline !important;
+    }
+</style>
+{% endblock %}
+
+{% block footer %}
+<div id="footer">
+    <p>© {% now "Y" %} CANIS ACADEMIA - Sistema de Gestión Canina</p>
+    <p>
+        <a href="/"><i class="fas fa-home"></i> Sitio Web Principal</a> |
+        <a href="/admin/"><i class="fas fa-tachometer-alt"></i> Dashboard</a> |
+        <a href="mailto:admin@canisacademia.com"><i class="fas fa-envelope"></i> Soporte</a> |
+        <a href="{% url 'admin_dashboard' %}"><i class="fas fa-user-shield"></i> Panel Personalizado</a>
+    </p>
+    <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">
+        <i class="fas fa-code"></i> Desarrollado con Django | 
+        <i class="fas fa-heart" style="color: #e74c3c;"></i> Para amantes de los perros
+    </p>
+</div>
+{% endblock %}

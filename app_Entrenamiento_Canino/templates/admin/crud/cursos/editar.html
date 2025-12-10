@@ -1,0 +1,106 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Curso{% endblock %}
+{% block page_subtitle %}Modificar información del curso{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_cursos' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_curso' curso.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Curso
+</a>
+{% endblock %}
+
+{% block card_icon %}edit{% endblock %}
+{% block card_title %}Editar Curso: {{ curso.nombre }}{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_curso' curso.id %}" class="needs-validation" novalidate enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label for="nombre" class="form-label">Nombre del Curso *</label>
+            <input type="text" class="form-control admin-form-control" id="nombre" name="nombre" 
+                   value="{{ curso.nombre }}" required>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="precio" class="form-label">Precio ($) *</label>
+            <input type="number" step="0.01" class="form-control admin-form-control" id="precio" name="precio"
+                   value="{{ curso.precio }}" required>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción *</label>
+        <textarea class="form-control admin-form-control" id="descripcion" name="descripcion" rows="4" required>{{ curso.descripcion }}</textarea>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="duracion" class="form-label">Duración (horas) *</label>
+            <input type="number" class="form-control admin-form-control" id="duracion" name="duracion"
+                   value="{{ curso.duracion }}" required>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="nivel" class="form-label">Nivel *</label>
+            <select class="form-select admin-form-control" id="nivel" name="nivel" required>
+                <option value="principiante" {% if curso.nivel == 'principiante' %}selected{% endif %}>Principiante</option>
+                <option value="intermedio" {% if curso.nivel == 'intermedio' %}selected{% endif %}>Intermedio</option>
+                <option value="avanzado" {% if curso.nivel == 'avanzado' %}selected{% endif %}>Avanzado</option>
+            </select>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="cupo_maximo" class="form-label">Cupo Máximo</label>
+            <input type="number" class="form-control admin-form-control" id="cupo_maximo" name="cupo_maximo"
+                   value="{{ curso.cupo_maximo|default:'' }}">
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="imagen" class="form-label">Imagen del Curso</label>
+            {% if curso.imagen %}
+            <div class="mb-2">
+                <img src="{{ curso.imagen.url }}" alt="{{ curso.nombre }}" class="img-thumbnail" style="max-height: 100px;">
+                <div class="form-text">Imagen actual</div>
+            </div>
+            {% endif %}
+            <input type="file" class="form-control admin-form-control" id="imagen" name="imagen" accept="image/*">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="video_presentacion" class="form-label">Video de Presentación (URL)</label>
+            <input type="url" class="form-control admin-form-control" id="video_presentacion" name="video_presentacion"
+                   value="{{ curso.video_presentacion|default:'' }}">
+        </div>
+    </div>
+    
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="activo" name="activo" {% if curso.activo %}checked{% endif %}>
+        <label class="form-check-label" for="activo">
+            Curso activo (disponible para compra)
+        </label>
+    </div>
+    
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="destacado" name="destacado" {% if curso.destacado %}checked{% endif %}>
+        <label class="form-check-label" for="destacado">
+            Curso destacado (aparecerá en la página principal)
+        </label>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_cursos' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}

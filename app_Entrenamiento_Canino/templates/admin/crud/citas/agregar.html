@@ -1,0 +1,170 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Agregar Cita{% endblock %}
+{% block page_subtitle %}Nueva cita programada{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_citas' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+{% endblock %}
+
+{% block card_icon %}calendar-plus{% endblock %}
+{% block card_title %}Formulario de Nueva Cita{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'agregar_cita' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Cliente *</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente" required>
+                <option value="">Seleccionar cliente</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.email }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un cliente.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="perro" class="form-label">Perro (opcional)</label>
+            <select class="form-select admin-form-control" id="perro" name="perro">
+                <option value="">Seleccionar perro</option>
+                {% for perro in perros %}
+                <option value="{{ perro.id }}">{{ perro.nombre }} - {{ perro.raza }} - Dueño: {{ perro.cliente.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="entrenador" class="form-label">Entrenador *</label>
+            <select class="form-select admin-form-control" id="entrenador" name="entrenador" required>
+                <option value="">Seleccionar entrenador</option>
+                {% for entrenador in entrenadores %}
+                {% if entrenador.disponible %}
+                <option value="{{ entrenador.id }}">{{ entrenador.nombre }} {{ entrenador.apellido }} - {{ entrenador.especialidad|title }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un entrenador.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="tipo_cita" class="form-label">Tipo de Cita *</label>
+            <select class="form-select admin-form-control" id="tipo_cita" name="tipo_cita" required>
+                <option value="">Seleccionar tipo</option>
+                <option value="consulta_inicial">Consulta Inicial</option>
+                <option value="entrenamiento_individual">Entrenamiento Individual</option>
+                <option value="sesion_grupal">Sesión Grupal</option>
+                <option value="seguimiento">Seguimiento</option>
+                <option value="evaluacion">Evaluación</option>
+                <option value="otro">Otro</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona el tipo de cita.</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha *</label>
+            <input type="date" class="form-control admin-form-control" id="fecha" name="fecha" required>
+            <div class="invalid-feedback">Por favor selecciona la fecha.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="hora_inicio" class="form-label">Hora de Inicio *</label>
+            <input type="time" class="form-control admin-form-control" id="hora_inicio" name="hora_inicio" required>
+            <div class="invalid-feedback">Por favor selecciona la hora de inicio.</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="duracion" class="form-label">Duración (minutos) *</label>
+            <select class="form-select admin-form-control" id="duracion" name="duracion" required>
+                <option value="30">30 minutos</option>
+                <option value="60" selected>60 minutos</option>
+                <option value="90">90 minutos</option>
+                <option value="120">120 minutos</option>
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="estado" class="form-label">Estado *</label>
+            <select class="form-select admin-form-control" id="estado" name="estado" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmada" selected>Confirmada</option>
+                <option value="cancelada">Cancelada</option>
+                <option value="completada">Completada</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="ubicacion" class="form-label">Ubicación *</label>
+        <select class="form-select admin-form-control" id="ubicacion" name="ubicacion" required>
+            <option value="">Seleccionar ubicación</option>
+            <option value="academia">En la Academia</option>
+            <option value="domicilio">En Domicilio</option>
+            <option value="parque">En el Parque</option>
+            <option value="virtual">Virtual (Videollamada)</option>
+        </select>
+        <div class="invalid-feedback">Por favor selecciona la ubicación.</div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="notas" class="form-label">Notas / Observaciones</label>
+        <textarea class="form-control admin-form-control" id="notas" name="notas" rows="3"></textarea>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_citas' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cita
+        </button>
+    </div>
+</form>
+
+<script>
+// Calcular hora de fin automáticamente
+document.getElementById('hora_inicio').addEventListener('change', calcularHoraFin);
+document.getElementById('duracion').addEventListener('change', calcularHoraFin);
+
+function calcularHoraFin() {
+    var horaInicio = document.getElementById('hora_inicio').value;
+    var duracion = document.getElementById('duracion').value;
+    
+    if (horaInicio && duracion) {
+        var [horas, minutos] = horaInicio.split(':').map(Number);
+        var fecha = new Date();
+        fecha.setHours(horas);
+        fecha.setMinutes(minutos + parseInt(duracion));
+        
+        var horaFin = fecha.getHours().toString().padStart(2, '0') + ':' + 
+                     fecha.getMinutes().toString().padStart(2, '0');
+        
+        // Mostrar información de horario
+        var infoDiv = document.getElementById('horario-info') || document.createElement('div');
+        infoDiv.id = 'horario-info';
+        infoDiv.className = 'alert alert-info mt-3';
+        infoDiv.innerHTML = `
+            <i class="fas fa-clock"></i>
+            <strong>Horario programado:</strong><br>
+            Inicio: <strong>${horaInicio}</strong><br>
+            Duración: <strong>${duracion} minutos</strong><br>
+            Fin estimado: <strong>${horaFin}</strong>
+        `;
+        
+        if (!document.getElementById('horario-info')) {
+            document.querySelector('form').insertBefore(infoDiv, document.querySelector('.d-flex'));
+        }
+    }
+}
+</script>
+{% endblock %}

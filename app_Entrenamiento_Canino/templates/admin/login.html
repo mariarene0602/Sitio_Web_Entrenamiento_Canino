@@ -1,0 +1,373 @@
+<!-- app_Entrenamiento_Canino/templates/admin/login.html -->
+<!DOCTYPE html>
+{% load i18n static %}
+<html lang="es">
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== BODY ========== */
+body {
+    background: linear-gradient(135deg, #8b6b4d 0%, #2c3e50 100%);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ========== CONTENEDOR ========== */
+#container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 450px;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+}
+
+/* ========== HEADER ========== */
+#header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+    border-radius: 0;
+    border: none;
+}
+
+#branding h1 {
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+#branding h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+/* ========== CONTENT ========== */
+#content {
+    padding: 40px;
+}
+
+#content-main {
+    float: none;
+    width: 100%;
+}
+
+/* ========== TÍTULO ========== */
+#content h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin: 0 0 30px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font-weight: 700;
+}
+
+/* ========== FORMULARIO ========== */
+.form-row {
+    margin-bottom: 25px;
+    padding: 0;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s;
+    background: #f8f9fa;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #8b6b4d;
+    box-shadow: 0 0 0 4px rgba(139, 107, 77, 0.15);
+    outline: none;
+    background: white;
+}
+
+/* ========== BOTÓN ========== */
+.submit-row {
+    text-align: center;
+    padding: 0;
+    margin: 30px 0 0 0;
+}
+
+.submit-row input[type="submit"] {
+    background: linear-gradient(135deg, #8b6b4d 0%, #a07d5a 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    padding: 16px 30px;
+    font-size: 16px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.submit-row input[type="submit"]:hover {
+    background: linear-gradient(135deg, #7a5c42 0%, #8b6b4d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 107, 77, 0.3);
+}
+
+/* ========== ERRORES ========== */
+.errornote {
+    background: #fff5f5;
+    border: 2px solid #fed7d7;
+    color: #c53030;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin: 0 0 25px 0;
+    font-weight: 500;
+}
+
+/* ========== FOOTER ========== */
+#footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 14px;
+}
+
+/* ========== LOGO PERSONALIZADO ========== */
+.admin-brand {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.admin-brand .logo-icon {
+    font-size: 2.5rem;
+    color: #8b6b4d;
+    margin-bottom: 15px;
+}
+
+.admin-brand h2 {
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.admin-brand p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+}
+
+/* ========== TARJETA INFO ========== */
+.info-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 25px;
+    text-align: center;
+    border-left: 4px solid #8b6b4d;
+}
+
+.info-card h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.info-card p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ========== ENLACES ========== */
+a {
+    color: #8b6b4d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #7a5c42;
+    text-decoration: underline;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    #container {
+        margin: 0;
+        width: 100%;
+    }
+    
+    #content {
+        padding: 30px 20px;
+    }
+}
+
+/* ========== BOTÓN DASHBOARD ========== */
+.dashboard-btn {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.dashboard-btn a {
+    display: inline-block;
+    background: #f8f9fa;
+    color: #2c3e50;
+    border: 2px solid #2c3e50;
+    border-radius: 10px;
+    padding: 12px 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.dashboard-btn a:hover {
+    background: #2c3e50;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dashboard-btn a i {
+    margin-right: 8px;
+}
+</style>
+</head>
+
+<body>
+<div id="container">
+    <div id="header">
+        <div id="branding">
+            <div class="admin-brand">
+                <div class="logo-icon">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <h2>CANIS ACADEMIA</h2>
+                <p>Panel de Administración</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="content" class="colM">
+        {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+        </p>
+        {% endif %}
+        
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <p class="errornote">
+            {{ error }}
+        </p>
+        {% endfor %}
+        {% endif %}
+        
+        <div id="content-main">
+            <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+                <div class="form-row">
+                    {{ form.username.errors }}
+                    {{ form.username.label_tag }} {{ form.username }}
+                </div>
+                <div class="form-row">
+                    {{ form.password.errors }}
+                    {{ form.password.label_tag }} {{ form.password }}
+                    <!-- ===== CAMBIO IMPORTANTE: Redirigir al dashboard ===== -->
+                    <input type="hidden" name="next" value="{% url 'admin_dashboard' %}">
+                </div>
+                {% url 'admin_password_reset' as password_reset_url %}
+                {% if password_reset_url %}
+                <div class="password-reset-link">
+                    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+                </div>
+                {% endif %}
+                <div class="submit-row">
+                    <input type="submit" value="{% trans 'Iniciar Sesión' %}">
+                </div>
+            </form>
+        </div>
+        
+        <div class="info-card">
+            <h4><i class="fas fa-info-circle"></i> Información de Acceso</h4>
+            <p>Usa tus credenciales de superusuario Django. Después del inicio de sesión serás redirigido automáticamente al dashboard.</p>
+        </div>
+        
+        <div id="footer">
+            <p>© {% now "Y" %} CANIS ACADEMIA | 
+               <a href="/">Volver al sitio principal</a> | 
+               <a href="mailto:soporte@canisacademia.com">Soporte Técnico</a>
+            </p>
+        </div>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar clases a los inputs del formulario Django
+            const usernameInput = document.querySelector('#id_username');
+            const passwordInput = document.querySelector('#id_password');
+            
+            if (usernameInput) {
+                usernameInput.className = '';
+                usernameInput.placeholder = 'Usuario';
+                usernameInput.setAttribute('style', 'width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px;');
+            }
+            
+            if (passwordInput) {
+                passwordInput.className = '';
+                passwordInput.placeholder = 'Contraseña';
+                passwordInput.setAttribute('style', 'width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px;');
+            }
+            
+            // Agregar estilos a las etiquetas
+            const labels = document.querySelectorAll('label');
+            labels.forEach(label => {
+                label.setAttribute('style', 'display: block; margin-bottom: 8px; color: #333; font-weight: 600;');
+            });
+            
+            // Si ya está autenticado, redirigir al dashboard
+            {% if user.is_authenticated %}
+            window.location.href = "{% url 'admin_dashboard' %}";
+            {% endif %}
+        });
+        </script>
+    </div>
+</div>
+</body>
+</html>

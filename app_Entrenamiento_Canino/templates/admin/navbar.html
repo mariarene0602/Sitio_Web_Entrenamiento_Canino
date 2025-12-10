@@ -1,0 +1,90 @@
+<!-- app_Entrenamiento_Canino/templates/admin/navbar.html -->
+<nav class="navbar navbar-expand-lg admin-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'admin_dashboard' %}">
+            <i class="fas fa-paw"></i> CANIS Academia - Admin
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
+                       href="{% url 'admin_dashboard' %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                
+                <!-- Menú desplegable para Gestión -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-database"></i> Gestión
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><h6 class="dropdown-header"><i class="fas fa-users"></i> Personas</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_clientes' %}">Clientes</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_entrenadores' %}">Entrenadores</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-paw"></i> Animales</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_perros' %}">Perros</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-graduation-cap"></i> Cursos</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_cursos' %}">Cursos</a></li>
+                        <!-- CAMBIA ESTAS LÍNEAS: -->
+                        <li><a class="dropdown-item" href="{% url 'ver_ofertas' %}">Ofertas</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-shopping-cart"></i> Transacciones</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_compras' %}">Compras</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_pagos' %}">Pagos</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ver_citas' %}">Citas</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-comment"></i> Contenido</h6></li>
+                        <!-- CAMBIA ESTA LÍNEA: -->
+                        <li><a class="dropdown-item" href="{% url 'ver_testimonios' %}">Testimonios</a></li>
+                    </ul>
+                </li>
+                
+                <!-- Enlace al Django Admin original -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+                        <i class="fas fa-user-shield"></i> Django Admin
+                    </a>
+                </li>
+
+            </ul>
+            
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-cog"></i> {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'home' %}" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Ver Sitio Web
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'perfil' %}">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

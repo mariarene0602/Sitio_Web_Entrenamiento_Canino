@@ -1,0 +1,127 @@
+<!-- app_Entrenamiento_Canino/templates/website/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CANIS Academia - Entrenamiento Canino Profesional</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <!-- Imagen de fondo CSS -->
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <h1 class="hero-title">CANIS <span>ACADEMIA</span></h1>
+                    <p class="hero-subtitle">Entrenamiento Canino Profesional</p>
+                    <p class="hero-description">Transformamos la relación entre tú y tu perro con métodos basados en el refuerzo positivo y la comunicación efectiva.</p>
+                    <div class="hero-buttons">
+                        <a href="{% url 'cursos' %}" class="btn btn-primary">Ver Cursos</a>
+                        <a href="{% url 'comprar_curso' %}" class="btn btn-secondary">Comprar Ahora</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="container">
+                <h2 class="section-title">¿Por Qué Elegirnos?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Entrenadores Certificados</h3>
+                        <p>Nuestro equipo cuenta con certificaciones internacionales y años de experiencia en comportamiento canino.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Método Positivo</h3>
+                        <p>Utilizamos exclusivamente técnicas de refuerzo positivo que fortalecen el vínculo con tu mascota.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <h3>Entrenamiento en Casa</h3>
+                        <p>Ofrecemos sesiones en tu hogar para mayor comodidad y efectividad en el entorno natural de tu perro.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Garantía de Resultados</h3>
+                        <p>Si no ves mejorías significativas, te ofrecemos sesiones adicionales sin costo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Courses Section -->
+        <section class="popular-courses-section">
+            <div class="container">
+                <h2 class="section-title">Nuestros Cursos Más Populares</h2>
+                <div class="courses-preview">
+                    {% for curso in cursos_populares %}
+                    <div class="course-preview-card">
+                        <div class="course-image">
+                            {% if curso.imagen %}
+                                <img src="{{ curso.imagen.url }}" 
+                                    alt="{{ curso.nombre }}"
+                                    onerror="this.onerror=null; this.src='{% static 'website/images/default-course.jpg' %}'">
+                            {% else %}
+                                <img src="{% static 'website/images/default-course.jpg' %}" 
+                                    alt="{{ curso.nombre }}">
+                            {% endif %}
+                            <span class="course-tag">{{ curso.nivel|upper }}</span>
+                        </div>
+                        <div class="course-info">
+                            <h3>{{ curso.nombre }}</h3>
+                            <p>{{ curso.descripcion|truncatewords:20 }}</p>
+                            <div class="course-price">
+                                <span class="price">${{ curso.precio }} MXN</span>
+                            </div>
+                            <div class="course-meta">
+                                <span><i class="fas fa-clock"></i> {{ curso.duracion }}</span>
+                            </div>
+                            <a href="{% url 'detalle_curso' curso.id %}" class="btn btn-small">Ver Detalles</a>
+                            <a href="{% url 'comprar_curso' %}?id={{ curso.id }}" class="btn btn-small btn-secondary">Comprar Ahora</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-courses">
+                        <p>No hay cursos disponibles en este momento.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="section-footer">
+                    <a href="{% url 'cursos' %}" class="btn btn-outline">Ver Todos los Cursos</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer Django -->
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+</body>
+</html>

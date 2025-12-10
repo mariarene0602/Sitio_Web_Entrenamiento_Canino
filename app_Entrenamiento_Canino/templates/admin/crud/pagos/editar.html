@@ -1,0 +1,312 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Pago{% endblock %}
+{% block page_subtitle %}Modificar información del pago{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_pagos' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_pago' pago.id %}" class="admin-btn-danger btn-confirm-delete" data-confirm-text="¿Está seguro de eliminar este pago?">
+    <i class="fas fa-trash"></i> Eliminar Pago
+</a>
+{% endblock %}
+
+{% block card_icon %}edit{% endblock %}
+{% block card_title %}Editar Pago #{{ pago.id }}{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_pago' pago.id %}" class="needs-validation" novalidate id="form-pago">
+    {% csrf_token %}
+    
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle"></i> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- Campo oculto para compra_id (fijo, no modificable) -->
+    <input type="hidden" name="compra" value="{{ pago.compra.id }}">
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Compra Asociada</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class="fas fa-shopping-cart"></i>
+                </span>
+                <input type="text" class="form-control admin-form-control bg-light" 
+                       value="Compra #{{ pago.compra.id }} - {{ pago.compra.cliente.nombre }} - ${{ pago.compra.monto }}" 
+                       readonly disabled>
+            </div>
+            <div class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> No se puede cambiar la compra de un pago existente
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="monto" class="form-label">Monto ($) *</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" step="0.01" min="0.01" class="form-control admin-form-control" 
+                       id="monto" name="monto" value="{{ pago.monto|floatformat:2 }}" 
+                       required oninput="validateMonto()">
+            </div>
+            <div class="invalid-feedback">Por favor ingrese un monto válido (mayor a 0)</div>
+            <div class="form-text">Monto original de la compra: <strong>${{ pago.compra.monto|floatformat:2 }}</strong></div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="fecha_pago" class="form-label">Fecha de Pago *</label>
+            <input type="datetime-local" class="form-control admin-form-control" 
+                   id="fecha_pago" name="fecha_pago" 
+                   value="{{ pago.fecha_pago|date:'Y-m-d\\TH:i' }}" required>
+            <div class="invalid-feedback">Por favor seleccione una fecha y hora</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="metodo_pago" class="form-label">Método de Pago *</label>
+            <select class="form-select admin-form-control" id="metodo_pago" name="metodo_pago" required>
+                <option value="">Seleccione método...</option>
+                <option value="tarjeta_credito" {% if pago.metodo_pago == 'tarjeta_credito' %}selected{% endif %}>
+                    Tarjeta de Crédito
+                </option>
+                <option value="tarjeta_debito" {% if pago.metodo_pago == 'tarjeta_debito' %}selected{% endif %}>
+                    Tarjeta de Débito
+                </option>
+                <option value="transferencia" {% if pago.metodo_pago == 'transferencia' %}selected{% endif %}>
+                    Transferencia Bancaria
+                </option>
+                <option value="efectivo" {% if pago.metodo_pago == 'efectivo' %}selected{% endif %}>
+                    Efectivo
+                </option>
+                <option value="paypal" {% if pago.metodo_pago == 'paypal' %}selected{% endif %}>
+                    PayPal
+                </option>
+                <option value="mercado_pago" {% if pago.metodo_pago == 'mercado_pago' %}selected{% endif %}>
+                    Mercado Pago
+                </option>
+                <option value="otros" {% if pago.metodo_pago == 'otros' %}selected{% endif %}>
+                    Otros
+                </option>
+            </select>
+            <div class="invalid-feedback">Por favor seleccione un método de pago</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="estado" class="form-label">Estado *</label>
+            <select class="form-select admin-form-control" id="estado" name="estado" required>
+                <option value="">Seleccione estado...</option>
+                <option value="pendiente" {% if pago.estado == 'pendiente' %}selected{% endif %}>
+                    Pendiente
+                </option>
+                <option value="aprobado" {% if pago.estado == 'aprobado' %}selected{% endif %}>
+                    Aprobado
+                </option>
+                <option value="rechazado" {% if pago.estado == 'rechazado' %}selected{% endif %}>
+                    Rechazado
+                </option>
+                <option value="reembolsado" {% if pago.estado == 'reembolsado' %}selected{% endif %}>
+                    Reembolsado
+                </option>
+            </select>
+            <div class="invalid-feedback">Por favor seleccione un estado</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="referencia_pago" class="form-label">Referencia/Comprobante</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-receipt"></i>
+                </span>
+                <input type="text" class="form-control admin-form-control" 
+                       id="referencia_pago" name="referencia_pago"
+                       value="{{ pago.referencia_pago|default:'' }}" 
+                       placeholder="Ej: TRANSF-00123, COMP-45678">
+            </div>
+            <div class="form-text">Número de transacción o comprobante</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="banco" class="form-label">Banco/Institución</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-university"></i>
+                </span>
+                <input type="text" class="form-control admin-form-control" 
+                       id="banco" name="banco"
+                       value="{{ pago.banco|default:'' }}" 
+                       placeholder="Ej: Banco Santander, PayPal, Mercado Pago">
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="observaciones" class="form-label">Observaciones</label>
+        <textarea class="form-control admin-form-control" id="observaciones" 
+                  name="observaciones" rows="3"
+                  placeholder="Notas adicionales sobre el pago...">{{ pago.observaciones|default:'' }}</textarea>
+    </div>
+    
+    <div class="card bg-light border-info mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="fas fa-info-circle"></i> Información del Pago
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Compra asociada:</strong> #{{ pago.compra.id }}</p>
+                    <p><strong>Cliente:</strong> {{ pago.compra.cliente.nombre_completo|default:pago.compra.cliente.nombre }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Curso/Servicio:</strong> {{ pago.compra.curso.nombre|truncatechars:50 }}</p>
+                    <p><strong>Monto compra:</strong> ${{ pago.compra.monto|floatformat:2 }}</p>
+                </div>
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <i class="fas fa-clock"></i> Creado: {{ pago.fecha_creacion|date:"d/m/Y H:i" }}
+                    {% if pago.fecha_actualizacion %}
+                    | Actualizado: {{ pago.fecha_actualizacion|date:"d/m/Y H:i" }}
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+        <a href="{% url 'ver_pagos' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <div>
+            <button type="button" class="admin-btn-secondary me-2" onclick="resetForm()">
+                <i class="fas fa-undo"></i> Restablecer
+            </button>
+            <button type="submit" class="admin-btn-primary" id="btn-guardar">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validación de monto
+    function validateMonto() {
+        const montoInput = document.getElementById('monto');
+        const monto = parseFloat(montoInput.value);
+        const montoCompra = parseFloat({{ pago.compra.monto }});
+        
+        if (monto > montoCompra) {
+            montoInput.classList.add('is-invalid');
+            document.querySelector('.form-text').innerHTML = 
+                `<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> 
+                El monto no puede ser mayor al de la compra ($${montoCompra.toFixed(2)})</span>`;
+            document.getElementById('btn-guardar').disabled = true;
+        } else if (monto <= 0) {
+            montoInput.classList.add('is-invalid');
+            document.getElementById('btn-guardar').disabled = true;
+        } else {
+            montoInput.classList.remove('is-invalid');
+            montoInput.classList.add('is-valid');
+            document.querySelector('.form-text').innerHTML = 
+                `Monto original de la compra: <strong>$${montoCompra.toFixed(2)}</strong>`;
+            document.getElementById('btn-guardar').disabled = false;
+        }
+    }
+    
+    // Restablecer formulario
+    function resetForm() {
+        if (confirm('¿Restablecer todos los cambios?')) {
+            document.getElementById('form-pago').reset();
+            validateMonto();
+        }
+    }
+    
+    // Validación del formulario
+    (function() {
+        'use strict';
+        
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+        
+        // Validar monto al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            validateMonto();
+            
+            // Confirmación de eliminación
+            const deleteBtn = document.querySelector('.btn-confirm-delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    const confirmText = this.getAttribute('data-confirm-text') || 
+                                      '¿Está seguro de eliminar este registro?';
+                    if (!confirm(confirmText)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            // Actualizar etiqueta del botón guardar durante el envío
+            const submitBtn = document.getElementById('btn-guardar');
+            const form = document.getElementById('form-pago');
+            
+            form.addEventListener('submit', function() {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+                submitBtn.disabled = true;
+            });
+        });
+    })();
+</script>
+
+<style>
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .input-group-text {
+        background-color: #e9ecef;
+        border-color: #ced4da;
+    }
+    
+    .admin-form-control:disabled {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    
+    .card.border-info {
+        border-width: 2px;
+    }
+    
+    #btn-guardar:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

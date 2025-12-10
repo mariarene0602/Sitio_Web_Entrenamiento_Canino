@@ -1,0 +1,315 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">MI PERFIL</h1>
+                <p class="page-subtitle">Gestiona tu información personal y el progreso de tus perros.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / <span>Mi Perfil</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="profile-section">
+            <div class="container">
+                
+                <!-- Encabezado de Bienvenida -->
+                <div class="profile-header-card">
+                    <div class="profile-avatar-large">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-welcome">
+                        <h1>Hola, {{ cliente.nombre }}</h1>
+                        <p>Bienvenida a tu espacio personal en CANIS Academia</p>
+                    </div>
+                </div>
+
+                <div class="profile-layout">
+                    <!-- BARRA LATERAL -->
+                    <div class="profile-sidebar">
+                        <nav class="profile-nav">
+                            <a href="#personal" class="nav-item active" onclick="openTab(event, 'personal')">
+                                <i class="fas fa-user-edit"></i> Información Personal
+                            </a>
+                            <a href="#dogs" class="nav-item" onclick="openTab(event, 'dogs')">
+                                <i class="fas fa-paw"></i> Mis Perros
+                            </a>
+                            <a href="#courses" class="nav-item" onclick="openTab(event, 'courses')">
+                                <i class="fas fa-graduation-cap"></i> Mis Cursos
+                            </a>
+                            <a href="{% url 'logout' %}" class="nav-item logout">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- CONTENIDO PRINCIPAL -->
+                    <div class="profile-content">
+                        
+                        <!-- TAB 1: INFORMACIÓN PERSONAL -->
+                        <div class="tab-content active" id="personal">
+                            <h2>Información Personal</h2>
+                            <form method="POST" action="{% url 'actualizar_perfil' %}">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nombre</label>
+                                        <input type="text" name="nombre" value="{{ cliente.nombre|default:user.first_name }}" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Apellido</label>
+                                        <input type="text" name="apellido" value="{{ cliente.apellido|default:user.last_name }}" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" value="{{ user.email }}" class="form-control" disabled style="background-color: #f8f9fa;">
+                                        <small>Para cambiar tu correo, contáctanos.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Teléfono</label>
+                                        <input type="tel" name="telefono" value="{{ cliente.telefono }}" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Dirección</label>
+                                    <textarea name="direccion" class="form-control" rows="2">{{ cliente.direccion }}</textarea>
+                                </div>
+                                
+                                <div class="form-actions text-end">
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+
+                            <div class="security-section">
+                                <h3>Seguridad</h3>
+                                <div class="security-actions">
+                                    <a href="{% url 'password_change' %}" class="btn btn-outline">Cambiar Contraseña</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: MIS PERROS -->
+                        <div class="tab-content" id="dogs">
+                            <div class="tab-header">
+                                <h2>Mis Perros</h2>
+                                <button class="btn btn-primary" onclick="openDogModal()">
+                                    <i class="fas fa-plus"></i> Agregar Perro
+                                </button>
+                            </div>
+
+                            <div class="dogs-grid">
+                                {% for perro in perros %}
+                                <div class="dog-card" data-id="{{ perro.id }}">
+                                    <div class="dog-avatar">
+                                        <i class="fas fa-dog"></i>
+                                    </div>
+                                    <div class="dog-info">
+                                        <h4>{{ perro.nombre }}</h4>
+                                        <p>{{ perro.raza }}</p>
+                                        <div class="dog-meta">
+                                            <span class="dog-sex {{ perro.sexo|lower }}">{{ perro.sexo }}</span>
+                                            <span class="dog-size">{{ perro.tamaño|default:"-" }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="dog-actions">
+                                        <a href="{% url 'borrar_perro' perro.id %}" class="btn-icon delete-dog" onclick="return confirm('¿Eliminar a {{ perro.nombre }}?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-state">
+                                    <i class="fas fa-paw"></i>
+                                    <h3>No tienes perros registrados</h3>
+                                    <p>Registra a tu mascota para inscribirla en cursos.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: MIS CURSOS (REDISEÑADO) -->
+                        <div class="tab-content" id="courses">
+                            <h2>Mis Cursos Inscritos</h2>
+                            
+                            <div class="user-courses-list">
+                                {% for compra in compras %}
+                                <div class="purchased-course-card">
+                                    <!-- Imagen del Curso -->
+                                    <div class="purchased-img">
+                                        {% if compra.curso.imagen %}
+                                            <img src="{{ compra.curso.imagen.url }}" alt="{{ compra.curso.nombre }}">
+                                        {% else %}
+                                            <img src="{% static 'website/images/default-course.jpg' %}" alt="Curso">
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Información del Curso -->
+                                    <div class="purchased-info">
+                                        <h3>{{ compra.curso.nombre }}</h3>
+                                        <p class="purchased-meta">
+                                            <span><i class="fas fa-layer-group"></i> {{ compra.curso.nivel|title }}</span>
+                                            <span><i class="fas fa-clock"></i> {{ compra.curso.duracion }} Horas</span>
+                                        </p>
+                                        <p class="purchased-date">
+                                            Inscrito el: {{ compra.fecha_compra|date:"d M, Y" }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Estado y Acción -->
+                                    <div class="purchased-status">
+                                        {% if compra.estado == 'completado' %}
+                                            <span class="status-badge active">
+                                                <i class="fas fa-check-circle"></i> ACTIVO
+                                            </span>
+                                            <p class="status-note">Te contactaremos pronto para iniciar.</p>
+                                        {% elif compra.estado == 'pendiente' %}
+                                            <span class="status-badge pending">
+                                                <i class="fas fa-clock"></i> PAGO PENDIENTE
+                                            </span>
+                                            <p class="status-note">Tu acceso se activará al confirmar el pago.</p>
+                                        {% else %}
+                                            <span class="status-badge cancelled">CANCELADO</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-state">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <h3>Aún no te has inscrito a ningún curso</h3>
+                                    <a href="{% url 'cursos' %}" class="btn btn-primary mt-3">Ver Cursos Disponibles</a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para agregar perro -->
+    <div class="modal-overlay" id="dog-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDogModal()">&times;</button>
+            <h2>Agregar Nuevo Perro</h2>
+            <form method="POST" action="{% url 'agregar_perro' %}">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Raza *</label>
+                        <input type="text" name="raza" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Edad (meses) *</label>
+                        <input type="number" name="edad" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number" name="peso" min="1" step="0.1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sexo *</label>
+                        <select name="sexo" required>
+                            <option value="Macho">Macho</option>
+                            <option value="Hembra">Hembra</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tamaño *</label>
+                        <select name="tamaño" required>
+                            <option value="pequeño">Pequeño</option>
+                            <option value="mediano">Mediano</option>
+                            <option value="grande">Grande</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Comportamiento</label>
+                    <textarea name="comportamiento" rows="2"></textarea>
+                </div>
+                <div class="form-actions text-end">
+                    <button type="button" class="btn btn-outline" onclick="closeDogModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include 'website/partials/footer.html' %}
+
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    
+    <script>
+        // Función para cambiar de pestañas
+        function openTab(evt, tabName) {
+            // Ocultar todos los contenidos
+            var tabcontent = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            
+            // Desactivar todos los botones
+            var tablinks = document.getElementsByClassName("nav-item");
+            for (var i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            // Mostrar el actual
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            
+            // Activar el botón clicado
+            if (evt) {
+                evt.currentTarget.className += " active";
+            }
+        }
+
+        // Funciones del Modal
+        function openDogModal() {
+            document.getElementById('dog-modal').style.display = 'flex';
+        }
+
+        function closeDogModal() {
+            document.getElementById('dog-modal').style.display = 'none';
+        }
+
+        // Inicializar (abrir primera pestaña)
+        document.addEventListener("DOMContentLoaded", function() {
+            // Simular clic en la primera pestaña para que cargue
+            document.querySelector('.nav-item.active').click();
+        });
+    </script>
+</body>
+</html>

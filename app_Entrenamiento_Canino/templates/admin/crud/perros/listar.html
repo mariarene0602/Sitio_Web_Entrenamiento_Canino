@@ -1,0 +1,93 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Gestión de Perros{% endblock %}
+
+{% block page_actions %}
+<!-- Botón para agregar, apunta a la misma URL que usaste en tu formulario -->
+<a href="{% url 'agregar_perro' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Perro
+</a>
+{% endblock %}
+
+{% block card_icon %}paw{% endblock %}
+{% block card_title %}Lista de Perros Registrados{% endblock %}
+
+{% block card_content %}
+{% if perros %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Perro</th> <!-- Nombre y Raza -->
+                <th>Características</th> <!-- Sexo, Edad, Tamaño -->
+                <th>Dueño</th>
+                <th>Observaciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for perro in perros %}
+            <tr>
+                <td>{{ perro.id }}</td>
+                <td>
+                    <strong>{{ perro.nombre }}</strong><br>
+                    <span class="text-muted">{{ perro.raza }}</span>
+                </td>
+                <td>
+                    <!-- Sexo con color distintivo -->
+                    {% if perro.sexo == 'Macho' %}
+                        <span class="badge bg-primary"><i class="fas fa-mars"></i> Macho</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-venus"></i> Hembra</span>
+                    {% endif %}
+                    
+                    <!-- Tamaño como etiqueta -->
+                    <span class="badge bg-secondary">{{ perro.tamaño|title }}</span>
+                    
+                    <div class="small mt-1 text-muted">
+                        <i class="fas fa-birthday-cake"></i> {{ perro.edad }} meses 
+                        {% if perro.peso %} | <i class="fas fa-weight"></i> {{ perro.peso }} kg{% endif %}
+                    </div>
+                </td>
+                <td>
+                    {% if perro.cliente %}
+                        <!-- Asumiendo que Cliente tiene campos nombre y apellido -->
+                        <i class="fas fa-user"></i> {{ perro.cliente.nombre }} {{ perro.cliente.apellido }}
+                    {% else %}
+                        <span class="text-muted fst-italic">Sin dueño asignado</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if perro.comportamiento %}
+                        <!-- Cortamos el texto si es muy largo para no romper la tabla -->
+                        <small>{{ perro.comportamiento|truncatechars:40 }}</small>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_perro' perro.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_perro' perro.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<!-- Estado vacío -->
+<div class="empty-state">
+    <i class="fas fa-paw"></i>
+    <h4>No hay perros registrados</h4>
+    <p class="text-muted">Comienza registrando las mascotas de tus clientes.</p>
+    <a href="{% url 'agregar_perro_admin' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Registrar Primer Perro
+    </a>
+</div>
+{% endif %}
+{% endblock %}

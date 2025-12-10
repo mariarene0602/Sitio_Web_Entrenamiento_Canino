@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonios - CANIS Academia</title>
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">TESTIMONIOS DE CLIENTES</h1>
+                <p class="page-subtitle">Historias reales de dueños y sus perros.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / <span>Testimonios</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials-section">
+            <div class="container">
+                <!-- ESTADÍSTICAS REALES CALCULADAS EN VIEWS.PY -->
+                <div class="testimonials-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ promedio }}</div>
+                        <div class="stat-label">Calificación Promedio</div>
+                        <div class="stat-stars">
+                            <!-- Estrellas decorativas del promedio -->
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_testimonios }}</div>
+                        <div class="stat-label">Testimonios Reales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_clientes_satisfechos }}%</div>
+                        <div class="stat-label">Clientes Satisfechos</div>
+                    </div>
+                </div>
+
+                <div class="testimonials-filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="cachorros">Cachorros</button>
+                    <button class="filter-btn" data-filter="obediencia">Obediencia</button>
+                    <button class="filter-btn" data-filter="conducta">Conducta</button>
+                </div>
+
+                <div class="testimonials-grid" id="testimonials-container">
+                    {% for testimonio in testimonios %}
+                    <div class="testimonial-card" 
+                        data-id="{{ testimonio.id }}"
+                        data-categoria="obediencia"
+                        data-fecha="{{ testimonio.fecha|date:'Y-m-d' }}">
+                        
+                        <div class="testimonial-header">
+                            <div class="client-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="client-info">
+                                <h4>{{ testimonio.cliente.nombre }} {{ testimonio.cliente.apellido }}</h4>
+                                <p class="text-muted small">Cliente verificado</p>
+                            </div>
+                            <!-- ESTRELLAS DINÁMICAS (Según lo que guardó el cliente) -->
+                            <div class="testimonial-rating" style="color: #ffc107; letter-spacing: 2px;">
+                                {% if testimonio.calificacion == 5 %}★★★★★
+                                {% elif testimonio.calificacion == 4 %}★★★★☆
+                                {% elif testimonio.calificacion == 3 %}★★★☆☆
+                                {% elif testimonio.calificacion == 2 %}★★☆☆☆
+                                {% else %}★☆☆☆☆{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-content">
+                            <p>"{{ testimonio.contenido }}"</p>
+                        </div>
+                        
+                        <div class="testimonial-footer">
+                            <span class="course-tag">Entrenamiento Canino</span>
+                            <span class="testimonial-date">{{ testimonio.fecha|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-testimonios" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-comments" style="font-size: 4rem; color: #ddd; margin-bottom: 20px;"></i>
+                        <h3>Aún no hay testimonios</h3>
+                        <p>Sé el primero en contarnos tu experiencia.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="add-testimonial-section">
+                    <h2>¿Ya tomaste un curso con nosotros?</h2>
+                    <p>Comparte tu experiencia y ayuda a otros dueños.</p>
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-primary" id="addTestimonialBtn">Agregar Mi Testimonio</button>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={% url 'testimonios' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Inicia sesión para opinar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Modal para agregar testimonio -->
+    {% if user.is_authenticated %}
+    <div class="modal-overlay" id="testimonialModal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2>Comparte Tu Experiencia</h2>
+            <form id="testimonialForm" method="POST" action="{% url 'agregar_testimonio_publico' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="testimonialText">Tu Testimonio</label>
+                    <textarea id="testimonialText" name="testimonio" rows="5" placeholder="¿Qué te pareció el curso?" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Calificación</label>
+                    <div class="rating-stars">
+                        <!-- name="rating" para enviar el valor al views.py -->
+                        <input type="radio" id="star5" name="rating" value="5" checked><label for="star5">★</label>
+                        <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                        <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                        <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    <script>
+        // Lógica simple del modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('addTestimonialBtn');
+            const modal = document.getElementById('testimonialModal');
+            
+            if(btn && modal) {
+                btn.addEventListener('click', () => modal.style.display = 'flex');
+                
+                modal.querySelector('.modal-close').addEventListener('click', () => modal.style.display = 'none');
+                
+                window.addEventListener('click', (e) => {
+                    if (e.target == modal) modal.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

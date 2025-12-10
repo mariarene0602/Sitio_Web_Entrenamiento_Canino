@@ -1,0 +1,108 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Entrenador{% endblock %}
+{% block page_subtitle %}Modificar datos de: {{ entrenador.nombre }} {{ entrenador.apellido }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_entrenadores' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+{% endblock %}
+
+{% block card_icon %}user-edit{% endblock %}
+{% block card_title %}Edición de Perfil{% endblock %}
+
+{% block card_content %}
+<form method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control admin-form-control" name="nombre" value="{{ entrenador.nombre }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control admin-form-control" name="apellido" value="{{ entrenador.apellido|default:'' }}">
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Email *</label>
+            <!-- CORREGIDO: name="email" y value="{{ entrenador.email }}" -->
+            <input type="email" class="form-control admin-form-control" name="email" value="{{ entrenador.email }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Teléfono *</label>
+            <input type="text" class="form-control admin-form-control" name="telefono" value="{{ entrenador.telefono }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Título Profesional</label>
+            <input type="text" class="form-control admin-form-control" name="titulo" value="{{ entrenador.titulo|default:'' }}">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Especialidad *</label>
+            <input type="text" class="form-control admin-form-control" name="especialidad" value="{{ entrenador.especialidad }}" required>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Años de Experiencia</label>
+            <input type="number" class="form-control admin-form-control" name="experiencia" value="{{ entrenador.experiencia }}">
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Tarifa por Hora ($)</label>
+            <input type="number" step="0.01" class="form-control admin-form-control" name="tarifa_hora" value="{{ entrenador.tarifa_hora }}">
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">Biografía</label>
+        <textarea class="form-control admin-form-control" name="bio" rows="4">{{ entrenador.bio }}</textarea>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Foto de Perfil</label>
+            {% if entrenador.foto %}
+                <div class="mb-2">
+                    <img src="{{ entrenador.foto.url }}" alt="Foto actual" style="height: 50px; border-radius: 5px;">
+                    <small class="text-muted ms-2">Foto actual</small>
+                </div>
+            {% endif %}
+            <input type="file" class="form-control admin-form-control" name="foto" accept="image/*">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Horario</label>
+            <input type="text" class="form-control admin-form-control" name="horario_disponibilidad" value="{{ entrenador.horario_disponibilidad|default:'' }}">
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="disponible" name="disponible" {% if entrenador.disponible %}checked{% endif %}>
+        <label class="form-check-label" for="disponible">Disponible para citas</label>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_entrenadores' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}

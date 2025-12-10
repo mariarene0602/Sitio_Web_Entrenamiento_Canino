@@ -1,0 +1,140 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Cita{% endblock %}
+{% block page_subtitle %}Modificar información de la cita{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_citas' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_cita' cita.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Cita
+</a>
+{% endblock %}
+
+{% block card_icon %}calendar-edit{% endblock %}
+{% block card_title %}Editar Cita #{{ cita.id }}{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_cita' cita.id %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Cliente *</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente" required disabled>
+                <option value="{{ cita.cliente.id }}" selected>
+                    {{ cita.cliente.nombre }} {{ cita.cliente.apellido }} - {{ cita.cliente.email }}
+                </option>
+            </select>
+            <div class="form-text">No se puede cambiar el cliente de una cita existente</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="perro" class="form-label">Perro</label>
+            <select class="form-select admin-form-control" id="perro" name="perro">
+                <option value="">Sin perro asignado</option>
+                {% for perro in perros %}
+                <option value="{{ perro.id }}" {% if cita.perro and cita.perro.id == perro.id %}selected{% endif %}>
+                    {{ perro.nombre }} - {{ perro.raza }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="entrenador" class="form-label">Entrenador *</label>
+            <select class="form-select admin-form-control" id="entrenador" name="entrenador" required>
+                <option value="">Seleccionar entrenador</option>
+                {% for entrenador in entrenadores %}
+                <option value="{{ entrenador.id }}" {% if cita.entrenador and cita.entrenador.id == entrenador.id %}selected{% endif %}>
+                    {{ entrenador.nombre }} {{ entrenador.apellido }} - {{ entrenador.especialidad|title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="tipo_cita" class="form-label">Tipo de Cita *</label>
+            <select class="form-select admin-form-control" id="tipo_cita" name="tipo_cita" required>
+                <option value="consulta_inicial" {% if cita.tipo_cita == 'consulta_inicial' %}selected{% endif %}>Consulta Inicial</option>
+                <option value="entrenamiento_individual" {% if cita.tipo_cita == 'entrenamiento_individual' %}selected{% endif %}>Entrenamiento Individual</option>
+                <option value="sesion_grupal" {% if cita.tipo_cita == 'sesion_grupal' %}selected{% endif %}>Sesión Grupal</option>
+                <option value="seguimiento" {% if cita.tipo_cita == 'seguimiento' %}selected{% endif %}>Seguimiento</option>
+                <option value="evaluacion" {% if cita.tipo_cita == 'evaluacion' %}selected{% endif %}>Evaluación</option>
+                <option value="otro" {% if cita.tipo_cita == 'otro' %}selected{% endif %}>Otro</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha *</label>
+            <input type="date" class="form-control admin-form-control" id="fecha" name="fecha"
+                   value="{{ cita.fecha|date:'Y-m-d' }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="hora_inicio" class="form-label">Hora de Inicio *</label>
+            <input type="time" class="form-control admin-form-control" id="hora_inicio" name="hora_inicio"
+                   value="{{ cita.hora_inicio|time:'H:i' }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="duracion" class="form-label">Duración (minutos) *</label>
+            <select class="form-select admin-form-control" id="duracion" name="duracion" required>
+                <option value="30" {% if cita.duracion == 30 %}selected{% endif %}>30 minutos</option>
+                <option value="60" {% if cita.duracion == 60 %}selected{% endif %}>60 minutos</option>
+                <option value="90" {% if cita.duracion == 90 %}selected{% endif %}>90 minutos</option>
+                <option value="120" {% if cita.duracion == 120 %}selected{% endif %}>120 minutos</option>
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="estado" class="form-label">Estado *</label>
+            <select class="form-select admin-form-control" id="estado" name="estado" required>
+                <option value="pendiente" {% if cita.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="confirmada" {% if cita.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                <option value="cancelada" {% if cita.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                <option value="completada" {% if cita.estado == 'completada' %}selected{% endif %}>Completada</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="ubicacion" class="form-label">Ubicación *</label>
+        <select class="form-select admin-form-control" id="ubicacion" name="ubicacion" required>
+            <option value="academia" {% if cita.ubicacion == 'academia' %}selected{% endif %}>En la Academia</option>
+            <option value="domicilio" {% if cita.ubicacion == 'domicilio' %}selected{% endif %}>En Domicilio</option>
+            <option value="parque" {% if cita.ubicacion == 'parque' %}selected{% endif %}>En el Parque</option>
+            <option value="virtual" {% if cita.ubicacion == 'virtual' %}selected{% endif %}>Virtual (Videollamada)</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="notas" class="form-label">Notas / Observaciones</label>
+        <textarea class="form-control admin-form-control" id="notas" name="notas" rows="3">{{ cita.notas|default:'' }}</textarea>
+    </div>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información de la cita:</strong><br>
+        Cliente: <strong>{{ cita.cliente.nombre }} {{ cita.cliente.apellido }}</strong><br>
+        Teléfono: <strong>{{ cita.cliente.telefono|default:"No registrado" }}</strong><br>
+        Creada: <strong>{{ cita.fecha_creacion|date:"d/m/Y H:i" }}</strong>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_citas' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}

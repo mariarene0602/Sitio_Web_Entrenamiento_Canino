@@ -1,0 +1,155 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Agregar Compra{% endblock %}
+{% block page_subtitle %}Nueva compra de curso{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_compras' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+{% endblock %}
+
+{% block card_icon %}cart-plus{% endblock %}
+{% block card_title %}Formulario de Nueva Compra{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'agregar_compra' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Cliente *</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente" required>
+                <option value="">Seleccionar cliente</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.email }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un cliente.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="curso" class="form-label">Curso *</label>
+            <select class="form-select admin-form-control" id="curso" name="curso" required>
+                <option value="">Seleccionar curso</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.id }}" data-precio="{{ curso.precio }}">
+                    {{ curso.nombre }} - ${{ curso.precio }} - {{ curso.nivel|title }}
+                </option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un curso.</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="monto" class="form-label">Monto ($) *</label>
+            <input type="number" step="0.01" class="form-control admin-form-control" id="monto" name="monto" required>
+            <div class="invalid-feedback">Por favor ingresa el monto.</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="descuento_aplicado" class="form-label">Descuento Aplicado (%)</label>
+            <div class="input-group">
+                <input type="number" class="form-control admin-form-control" id="descuento_aplicado" name="descuento_aplicado" 
+                       min="0" max="100" value="0">
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="fecha_compra" class="form-label">Fecha de Compra *</label>
+            <input type="datetime-local" class="form-control admin-form-control" id="fecha_compra" name="fecha_compra" 
+                   value="{{ now|date:'Y-m-d\\TH:i' }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="estado" class="form-label">Estado *</label>
+            <select class="form-select admin-form-control" id="estado" name="estado" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="completado" selected>Completado</option>
+                <option value="cancelado">Cancelado</option>
+                <option value="reembolsado">Reembolsado</option>
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="metodo_pago" class="form-label">Método de Pago</label>
+            <select class="form-select admin-form-control" id="metodo_pago" name="metodo_pago">
+                <option value="">Seleccionar método</option>
+                <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                <option value="tarjeta_debito">Tarjeta de Débito</option>
+                <option value="transferencia">Transferencia Bancaria</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="paypal">PayPal</option>
+                <option value="mercado_pago">Mercado Pago</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="observaciones" class="form-label">Observaciones</label>
+        <textarea class="form-control admin-form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+    </div>
+    
+    <div class="alert alert-info" id="precio-info">
+        <i class="fas fa-calculator"></i>
+        <strong>Información de precio:</strong>
+        <div id="precio-detalle">Selecciona un curso para ver el precio</div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_compras' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Compra
+        </button>
+    </div>
+</form>
+
+<script>
+document.getElementById('curso').addEventListener('change', function() {
+    var precio = this.options[this.selectedIndex].getAttribute('data-precio');
+    var montoInput = document.getElementById('monto');
+    var descuentoInput = document.getElementById('descuento_aplicado');
+    
+    if (precio) {
+        montoInput.value = parseFloat(precio);
+        actualizarPrecioDetalle(precio, descuentoInput.value);
+    }
+});
+
+document.getElementById('descuento_aplicado').addEventListener('input', function() {
+    var cursoSelect = document.getElementById('curso');
+    var precio = cursoSelect.options[cursoSelect.selectedIndex].getAttribute('data-precio');
+    var montoInput = document.getElementById('monto');
+    
+    if (precio && this.value) {
+        var precioNum = parseFloat(precio);
+        var descuentoNum = parseFloat(this.value);
+        var montoFinal = precioNum * (1 - descuentoNum / 100);
+        montoInput.value = montoFinal.toFixed(2);
+        actualizarPrecioDetalle(precio, this.value);
+    }
+});
+
+function actualizarPrecioDetalle(precio, descuento) {
+    var precioInfo = document.getElementById('precio-detalle');
+    if (precio) {
+        var precioNum = parseFloat(precio);
+        var descuentoNum = parseFloat(descuento) || 0;
+        var montoFinal = precioNum * (1 - descuentoNum / 100);
+        
+        precioInfo.innerHTML = `
+            Precio original: <strong>$${precioNum.toFixed(2)}</strong><br>
+            Descuento aplicado: <strong>${descuentoNum}%</strong><br>
+            Monto final: <strong class="text-success">$${montoFinal.toFixed(2)}</strong>
+        `;
+    }
+}
+</script>
+{% endblock %}

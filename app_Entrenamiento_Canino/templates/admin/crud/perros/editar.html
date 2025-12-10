@@ -1,0 +1,96 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Perro{% endblock %}
+{% block page_subtitle %}Modificar información del perro{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_perros' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_perro' perro.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Perro
+</a>
+{% endblock %}
+
+{% block card_icon %}dog{% endblock %}
+{% block card_title %}Editar Perro: {{ perro.nombre }}{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_perro' perro.id %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">Nombre del Perro *</label>
+            <input type="text" class="form-control admin-form-control" id="nombre" name="nombre" 
+                   value="{{ perro.nombre }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="raza" class="form-label">Raza *</label>
+            <input type="text" class="form-control admin-form-control" id="raza" name="raza"
+                   value="{{ perro.raza }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="edad" class="form-label">Edad (meses) *</label>
+            <input type="number" class="form-control admin-form-control" id="edad" name="edad" 
+                   value="{{ perro.edad }}" min="1" max="300" required>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="sexo" class="form-label">Sexo *</label>
+            <select class="form-select admin-form-control" id="sexo" name="sexo" required>
+                <option value="Macho" {% if perro.sexo == 'Macho' %}selected{% endif %}>Macho</option>
+                <option value="Hembra" {% if perro.sexo == 'Hembra' %}selected{% endif %}>Hembra</option>
+            </select>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="peso" class="form-label">Peso (kg)</label>
+            <input type="number" step="0.1" class="form-control admin-form-control" id="peso" name="peso"
+                   value="{{ perro.peso|default:'' }}" min="0.1" max="100">
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Dueño (Cliente)</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente">
+                <option value="">Sin dueño</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}" {% if perro.cliente.id == cliente.id %}selected{% endif %}>
+                    {{ cliente.nombre }} {{ cliente.apellido }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="tamaño" class="form-label">Tamaño *</label>
+            <select class="form-select admin-form-control" id="tamaño" name="tamaño" required>
+                <option value="pequeño" {% if perro.tamaño == 'pequeño' %}selected{% endif %}>Pequeño</option>
+                <option value="mediano" {% if perro.tamaño == 'mediano' or not perro.tamaño %}selected{% endif %}>Mediano</option>
+                <option value="grande" {% if perro.tamaño == 'grande' %}selected{% endif %}>Grande</option>
+                <option value="gigante" {% if perro.tamaño == 'gigante' %}selected{% endif %}>Gigante</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="comportamiento" class="form-label">Comportamiento / Observaciones</label>
+        <textarea class="form-control admin-form-control" id="comportamiento" name="comportamiento" rows="3">{{ perro.comportamiento|default:'' }}</textarea>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_perros' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}

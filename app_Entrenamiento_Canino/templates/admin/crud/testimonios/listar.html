@@ -1,0 +1,130 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Testimonios{% endblock %}
+{% block page_subtitle %}Gestión de testimonios de clientes{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_testimonio' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Testimonio
+</a>
+{% endblock %}
+
+{% block card_icon %}comment{% endblock %}
+{% block card_title %}Lista de Testimonios (Total: {{ testimonios|length }}){% endblock %}
+
+{% block card_content %}
+{% if testimonios %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Testimonio</th>
+                <th>Calificación</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for testimonio in testimonios %}
+            <tr>
+                <td>{{ testimonio.id }}</td>
+                <td>
+                    <strong>{{ testimonio.cliente.nombre }}</strong><br>
+                    <small>{{ testimonio.cliente.email }}</small>
+                </td>
+                <td>
+                    <div class="testimonio-text">{{ testimonio.contenido|truncatechars:100 }}</div>
+                    {% if testimonio.curso %}
+                    <small class="text-muted">Curso: {{ testimonio.curso.nombre }}</small>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="rating">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= testimonio.calificacion %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>{{ testimonio.fecha_creacion|date:"d/m/Y" }}</td>
+                <td>
+                    {% if testimonio.aprobado %}
+                    <span class="badge bg-success">Aprobado</span>
+                    {% else %}
+                    <span class="badge bg-warning">Pendiente</span>
+                    {% endif %}
+                    
+                    {% if testimonio.destacado %}
+                    <span class="badge bg-info mt-1">Destacado</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_testimonio' testimonio.id %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_testimonio' testimonio.id %}" class="btn btn-danger btn-sm btn-confirm-delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                    {% if not testimonio.aprobado %}
+                    <a href="#" class="btn btn-success btn-sm" title="Aprobar">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Total Testimonios</h6>
+                <h4>{{ total_testimonios }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Aprobados</h6>
+                <h4 class="text-success">{{ aprobados }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Pendientes</h6>
+                <h4 class="text-warning">{{ pendientes }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Promedio Calificación</h6>
+                <h4>{{ promedio_calificacion|floatformat:1 }} <i class="fas fa-star text-warning"></i></h4>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-comment"></i>
+    <h4>No hay testimonios registrados</h4>
+    <a href="{% url 'agregar_testimonio' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Agregar Primer Testimonio
+    </a>
+</div>
+{% endif %}
+{% endblock %}

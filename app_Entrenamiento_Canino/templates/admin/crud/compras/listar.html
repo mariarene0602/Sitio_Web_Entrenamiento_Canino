@@ -1,0 +1,121 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Compras{% endblock %}
+{% block page_subtitle %}Historial de compras de cursos{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_compra' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nueva Compra
+</a>
+{% endblock %}
+
+{% block card_icon %}shopping-cart{% endblock %}
+{% block card_title %}Lista de Compras (Total: {{ compras|length }}){% endblock %}
+
+{% block card_content %}
+{% if compras %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Curso</th>
+                <th>Fecha</th>
+                <th>Monto Final</th>
+                <th>Método Pago</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.id }}</td>
+                <td>
+                    <!-- Nombre y Apellido -->
+                    <strong>{{ compra.cliente.nombre }} {{ compra.cliente.apellido }}</strong><br>
+                    <!-- Correo (campo correcto del modelo) -->
+                    <small class="text-muted">{{ compra.cliente.correo }}</small>
+                </td>
+                <td>
+                    {{ compra.curso.nombre }}<br>
+                    <span class="badge bg-light text-dark border">{{ compra.curso.nivel|title }}</span>
+                </td>
+                <td>{{ compra.fecha_compra|date:"d/m/Y" }}</td>
+                <td>
+                    <!-- PRECIO FINAL (Nombre correcto del campo) -->
+                    <strong class="text-success">${{ compra.precio_final }}</strong>
+                    
+                    {% if compra.descuento_aplicado > 0 %}
+                    <br><small class="text-muted" style="text-decoration: line-through;">${{ compra.precio_base }}</small>
+                    <small class="text-danger">(-${{ compra.descuento_aplicado }})</small>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- MAGIA: Buscar el método de pago en la tabla relacionada -->
+                    {% with pago=compra.pago_set.first %}
+                        {% if pago %}
+                            {% if pago.metodo_pago == 'card' %}
+                                <span class="badge bg-primary"><i class="fas fa-credit-card"></i> Tarjeta</span>
+                            {% elif pago.metodo_pago == 'transfer' %}
+                                <span class="badge bg-info text-dark"><i class="fas fa-university"></i> Transferencia</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ pago.metodo_pago }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted small">-</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
+                    {% if compra.estado == 'completado' %}
+                        <span class="badge bg-success">Completado</span>
+                    {% elif compra.estado == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif compra.estado == 'cancelado' %}
+                        <span class="badge bg-danger">Cancelado</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ compra.estado }}</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_compra' compra.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_compra' compra.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Estadísticas (Opcional, solo si tu view calcula estos datos) -->
+{% if total_ingresos %}
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Total Ingresos</h6>
+                <h4 class="text-success">${{ total_ingresos|default:"0.00" }}</h4>
+            </div>
+        </div>
+    </div>
+    <!-- Puedes agregar más estadísticas aquí si tu views.py las envía -->
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-shopping-cart"></i>
+    <h4>No hay compras registradas</h4>
+    <p>Las compras realizadas en el sitio web aparecerán aquí.</p>
+    <a href="{% url 'agregar_compra' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Registrar Compra Manual
+    </a>
+</div>
+{% endif %}
+{% endblock %}

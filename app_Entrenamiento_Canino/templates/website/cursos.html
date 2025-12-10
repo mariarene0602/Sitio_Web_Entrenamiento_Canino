@@ -1,0 +1,411 @@
+<!-- app_Entrenamiento_Canino/templates/website/cursos.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">NUESTROS CURSOS</h1>
+                <p class="page-subtitle">Programas de entrenamiento basados en la comunicación y el refuerzo positivo.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / <span>Cursos</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="courses-section">
+            <div class="container">
+                <div class="courses-filters">
+
+                    <div class="filter-group">
+                        <label for="level-filter">Nivel:</label>
+                        <select id="level-filter" class="filter-select">
+                            <option value="all">Todos los niveles</option>
+                            {% for nivel in categorias %}
+                                <option value="{{ nivel }}">{{ nivel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="price-filter">Precio:</label>
+                        <select id="price-filter" class="filter-select">
+                            <option value="all">Todos los precios</option>
+                            <option value="0-1500">Hasta $1,500</option>
+                            <option value="1500-2500">$1,500 - $2,500</option>
+                            <option value="2500-3500">$2,500 - $3,500</option>
+                            <option value="3500+">Más de $3,500</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-filter">Ordenar por:</label>
+                        <select id="sort-filter" class="filter-select">
+                            <option value="popular">Más populares</option>
+                            <option value="price-low">Precio: Menor a Mayor</option>
+                            <option value="price-high">Precio: Mayor a Menor</option>
+                            <option value="name">Nombre A-Z</option>
+                        </select>
+                    </div>
+                    <button id="reset-filters" class="btn btn-outline">Limpiar Filtros</button>
+                </div>
+
+                <div class="courses-stats">
+                    <div class="stat-item">
+                        <span id="courses-count">{{ cursos|length }}</span> cursos encontrados
+                    </div>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="courses-container">
+                    <div class="courses-grid" id="courses-container">
+                        <!-- CURSOS DINÁMICOS DE DJANGO -->
+                        {% for curso in cursos %}
+                        <div class="course-card" 
+                             data-id="{{ curso.id }}"
+                             data-categoria="{{ curso.nivel|lower|slugify }}"
+                             data-nivel="{{ curso.nivel }}"
+                             data-precio="{{ curso.precio }}"
+                             data-nombre="{{ curso.nombre }}"
+                             data-popularidad="{% cycle '95' '88' '92' '85' '78' '82' '90' '87' '96' %}">
+                            
+                            <div class="course-image">
+                                {% if curso.imagen %}
+                                    <img src="{{ curso.imagen.url }}" 
+                                         alt="{{ curso.nombre }}"
+                                         onerror="this.onerror=null; this.src='{% static 'website/images/default-course.jpg' %}'">
+                                {% else %}
+                                    <img src="{% static 'website/images/default-course.jpg' %}" 
+                                         alt="{{ curso.nombre }}">
+                                {% endif %}
+                                <div class="course-level {{ curso.nivel|lower }}">{{ curso.nivel }}</div>
+                            </div>
+                            
+                            <div class="course-content">
+                                <div class="course-category">{{ curso.nivel }}</div>
+                                <h3 class="course-title">{{ curso.nombre }}</h3>
+                                <p class="course-description">{{ curso.descripcion|truncatewords:30 }}</p>
+                                
+                                <div class="course-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>{{ curso.duracion }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>{% cycle '95' '88' '92' '85' '78' '82' '90' '87' '96' %}% popular</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="course-price-section">
+                                    <div class="price-container">
+                                        <span class="current-price">${{ curso.precio }} MXN</span>
+                                    </div>
+                                    <div class="course-actions">
+                                        <a href="{% url 'comprar_curso' %}?id={{ curso.id }}" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart"></i> Comprar
+                                        </a>
+                                        <button class="btn btn-outline view-details" data-id="{{ curso.id }}">
+                                            <a href="{% url 'detalle_curso' curso.id %}">Ver Detalles</a>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="no-results">
+                            <i class="fas fa-search"></i>
+                            <h3>No se encontraron cursos</h3>
+                            <p>Pronto agregaremos nuevos cursos.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="no-results" id="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No se encontraron cursos</h3>
+                    <p>Intenta con otros filtros o <a href="#" id="reset-search">limpiar la búsqueda</a>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>¿No encuentras el curso ideal para tu perro?</h2>
+                    <p>Contáctanos para una evaluación personalizada y creemos un plan de entrenamiento a medida.</p>
+                    <div class="cta-buttons">
+                        <a href="{% url 'comprar_curso' %}" class="btn btn-primary">Comprar Curso</a>
+                        <a href="#" class="btn btn-outline" id="contact-advisor">Contactar Asesor</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer Django -->
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Modal de detalles del curso -->
+    <div class="modal-overlay" id="course-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="course-details-modal" id="course-details-content">
+                <!-- Contenido dinámico con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    
+    <!-- JavaScript específico para cursos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Función para formatear precios
+            function formatPrice(price) {
+                return new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN'
+                }).format(price);
+            }
+
+            // Función para mostrar notificaciones
+            function showNotification(message, type = 'info') {
+                // Puedes usar SweetAlert2 o un sistema de notificaciones más bonito
+                alert(message);
+            }
+
+            // Obtener todos los cursos del DOM
+            function getAllCourses() {
+                const courseCards = document.querySelectorAll('.course-card');
+                const courses = [];
+                
+                courseCards.forEach(card => {
+                    if (card.dataset.id) {
+                        courses.push({
+                            id: parseInt(card.dataset.id),
+                            nombre: card.dataset.nombre,
+                            nivel: card.dataset.nivel,
+                            categoria: card.dataset.categoria,
+                            precio: parseFloat(card.dataset.precio),
+                            popularidad: parseInt(card.dataset.popularidad),
+                            element: card
+                        });
+                    }
+                });
+                
+                return courses;
+            }
+
+            // Filtros
+            function setupFilters() {
+                const categoryFilter = document.getElementById('category-filter');
+                const levelFilter = document.getElementById('level-filter');
+                const priceFilter = document.getElementById('price-filter');
+                const sortFilter = document.getElementById('sort-filter');
+                const resetFilters = document.getElementById('reset-filters');
+                const resetSearch = document.getElementById('reset-search');
+                const coursesCount = document.getElementById('courses-count');
+                const noResults = document.getElementById('no-results');
+                const coursesContainer = document.getElementById('courses-container');
+
+                const allCourses = getAllCourses();
+                let filteredCourses = [...allCourses];
+
+                function updateDisplay() {
+                    let visibleCount = 0;
+                    
+                    allCourses.forEach(course => {
+                        const shouldShow = filteredCourses.some(fc => fc.id === course.id);
+                        course.element.style.display = shouldShow ? 'block' : 'none';
+                        if (shouldShow) visibleCount++;
+                    });
+
+                    coursesCount.textContent = visibleCount;
+                    
+                    if (visibleCount === 0) {
+                        noResults.style.display = 'block';
+                        coursesContainer.style.display = 'none';
+                    } else {
+                        noResults.style.display = 'none';
+                        coursesContainer.style.display = 'grid';
+                    }
+                }
+
+                function filterCourses() {
+                    const category = categoryFilter.value;
+                    const level = levelFilter.value;
+                    const priceRange = priceFilter.value;
+
+                    filteredCourses = allCourses.filter(course => {
+                        // Filtrar por categoría (si tienes categorías específicas)
+                        if (category !== 'all') {
+                            // Aquí necesitas mapear tus niveles a categorías
+                            const categoryMap = {
+                                'cachorros': ['Principiante'],
+                                'basico': ['Principiante', 'Intermedio'],
+                                'avanzado': ['Avanzado'],
+                                'especializado': ['Avanzado'],
+                                'online': ['Intermedio'],
+                                'mantenimiento': ['Intermedio']
+                            };
+                            
+                            if (categoryMap[category] && !categoryMap[category].includes(course.nivel)) {
+                                return false;
+                            }
+                        }
+                        
+                        // Filtrar por nivel
+                        if (level !== 'all' && course.nivel !== level) return false;
+                        
+                        // Filtrar por precio
+                        if (priceRange !== 'all') {
+                            if (priceRange === '0-1500' && course.precio > 1500) return false;
+                            if (priceRange === '1500-2500' && (course.precio < 1500 || course.precio > 2500)) return false;
+                            if (priceRange === '2500-3500' && (course.precio < 2500 || course.precio > 3500)) return false;
+                            if (priceRange === '3500+' && course.precio <= 3500) return false;
+                        }
+                        
+                        return true;
+                    });
+
+                    // Aplicar ordenamiento
+                    sortCourses();
+                    updateDisplay();
+                }
+
+                function sortCourses() {
+                    const sortBy = sortFilter.value;
+                    
+                    // Ordenar visualmente los elementos en el DOM
+                    const sortedCourses = [...filteredCourses].sort((a, b) => {
+                        switch(sortBy) {
+                            case 'price-low':
+                                return a.precio - b.precio;
+                            case 'price-high':
+                                return b.precio - a.precio;
+                            case 'name':
+                                return a.nombre.localeCompare(b.nombre);
+                            case 'popular':
+                            default:
+                                return b.popularidad - a.popularidad;
+                        }
+                    });
+
+                    // Reordenar elementos en el DOM
+                    sortedCourses.forEach(course => {
+                        coursesContainer.appendChild(course.element);
+                    });
+                }
+
+                function resetAllFilters() {
+                    categoryFilter.value = 'all';
+                    levelFilter.value = 'all';
+                    priceFilter.value = 'all';
+                    sortFilter.value = 'popular';
+                    filteredCourses = [...allCourses];
+                    updateDisplay();
+                }
+
+                // Event Listeners
+                categoryFilter.addEventListener('change', filterCourses);
+                levelFilter.addEventListener('change', filterCourses);
+                priceFilter.addEventListener('change', filterCourses);
+                sortFilter.addEventListener('change', sortCourses);
+                resetFilters.addEventListener('click', resetAllFilters);
+                resetSearch.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetAllFilters();
+                });
+
+                // Inicializar
+                updateDisplay();
+            }
+
+            // Vista de cuadrícula/lista
+            function setupViewOptions() {
+                const viewButtons = document.querySelectorAll('.view-btn');
+                const coursesContainer = document.getElementById('courses-container');
+
+                viewButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        viewButtons.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        const viewType = this.getAttribute('data-view');
+                        
+                        coursesContainer.className = `courses-${viewType}`;
+                        document.querySelectorAll('.course-card').forEach(card => {
+                            if (viewType === 'list') {
+                                card.classList.add('list-view');
+                            } else {
+                                card.classList.remove('list-view');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Botones de detalles
+            function setupDetailButtons() {
+                document.querySelectorAll('.view-details').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const courseId = this.getAttribute('data-id');
+                        const modal = document.getElementById('course-modal');
+                        
+                        // Aquí podrías hacer una petición AJAX para obtener detalles del curso
+                        // Por ahora, solo redirigimos a la página de compra
+                        window.location.href = "/curso/" + courseId + "/";
+                    });
+                });
+            }
+
+            // Contactar asesor
+            document.getElementById('contact-advisor').addEventListener('click', function(e) {
+                e.preventDefault();
+                showNotification('Próximamente podrás contactar a un asesor directamente desde aquí.', 'info');
+            });
+
+            // Cerrar modal
+            document.querySelector('.modal-close').addEventListener('click', function() {
+                document.getElementById('course-modal').style.display = 'none';
+            });
+
+            document.getElementById('course-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+
+            // Inicializar todo
+            setupFilters();
+            setupViewOptions();
+            setupDetailButtons();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{% load static %}
+<footer class="main-footer">
+    <div class="footer-container">
+        <!-- COLUMNA 1: Logo e Información del Alumno -->
+        <div class="footer-section">
+            <div class="footer-logo">
+                <!-- AQUÍ VA TU LOGO -->
+                <!-- Asegúrate de cambiar 'logo.png' por el nombre real de tu archivo -->
+                <img src="{% static 'website/images/logo.png' %}" 
+                     alt="Logo CANIS" 
+                     style="max-width: 120px; margin-bottom: 15px; display: block;">
+                
+                <h2>CANIS ACADEMIA</h2>
+                <p>Entrenamiento Canino Profesional</p>
+            </div>
+            
+            <p class="footer-description">Transformamos la relación entre dueños y sus perros mediante métodos científicos y respetuosos.</p>
+            
+            <!-- SECCIÓN DE DATOS DEL ALUMNO -->
+            <div class="student-info" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 3px solid #D4AF37;">
+                <h5 style="color: #fff; margin-bottom: 10px; font-size: 1rem;">Información del Proyecto</h5>
+                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.8);">
+                    <li style="margin-bottom: 5px;"><strong>Materia:</strong> Construye aplicaciones web</li>
+                    <li style="margin-bottom: 5px;"><strong>Alumna:</strong> Hernández Sánchez María Rene</li>
+                    <li style="margin-bottom: 5px;"><strong>Grupo:</strong> 5-I &nbsp;|&nbsp; <strong>No. Control:</strong> 0602</li>
+                </ul>
+            </div>
+
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+
+        <!-- COLUMNA 2: Enlaces -->
+        <div class="footer-section">
+            <h3>Enlaces Rápidos</h3>
+            <ul>
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'ofertas' %}">Ofertas</a></li>
+                <li><a href="{% url 'testimonios' %}">Testimonios</a></li>
+                <li><a href="{% url 'comprar_curso' %}">Comprar Curso</a></li>
+            </ul>
+        </div>
+
+        <!-- COLUMNA 3: Contacto -->
+        <div class="footer-section">
+            <h3>Contacto</h3>
+            <ul class="contact-info">
+                <li><i class="fas fa-map-marker-alt"></i> Av. Canina 123, CDMX</li>
+                <li><i class="fas fa-phone"></i> (55) 1234-5678</li>
+                <li><i class="fas fa-envelope"></i> info@canisacademia.com</li>
+            </ul>
+        </div>
+
+        <!-- COLUMNA 4: Horario -->
+        <div class="footer-section">
+            <h3>Horario</h3>
+            <ul class="schedule-info">
+                <li>Lunes - Viernes: 9:00 - 18:00</li>
+                <li>Sábados: 9:00 - 14:00</li>
+                <li>Domingos: Cerrado</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- BARRA INFERIOR -->
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} CANIS Academia. Todos los derechos reservados.</p>
+        <p>Desarrollado por: <strong>María Rene Hernández Sánchez</strong></p>
+    </div>
+</footer>

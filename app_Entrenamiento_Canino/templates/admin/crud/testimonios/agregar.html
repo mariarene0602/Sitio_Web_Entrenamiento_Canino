@@ -1,0 +1,139 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Agregar Testimonio{% endblock %}
+{% block page_subtitle %}Registrar opinión de cliente{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_testimonios' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+{% endblock %}
+
+{% block card_icon %}comment-alt{% endblock %}
+{% block card_title %}Nuevo Testimonio{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'agregar_testimonio' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <label for="cliente" class="form-label">Cliente *</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente" required>
+                <option value="">-- Seleccionar Cliente --</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">
+                    {{ cliente.nombre }} {{ cliente.apellido }} ({{ cliente.correo }})
+                </option>
+                {% empty %}
+                <option value="" disabled>No hay clientes registrados</option>
+                {% endfor %}
+            </select>
+            <div class="form-text">¿No encuentras al cliente? Regístralo primero en la sección de Clientes.</div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <!-- CAMBIA 'testimonio' POR 'contenido' -->
+        <label for="contenido" class="form-label">Testimonio / Comentario *</label>
+        <textarea class="form-control admin-form-control" id="contenido" name="contenido" rows="5" 
+                placeholder="Escribe aquí la experiencia del cliente..." required></textarea>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <!-- CAMBIA 'fecha' POR 'fecha_creacion' -->
+            <label for="fecha_creacion" class="form-label">Fecha (Opcional)</label>
+            <input type="date" class="form-control admin-form-control" id="fecha_creacion" name="fecha_creacion">
+            <div class="form-text">Si se deja vacío, se usará la fecha de hoy.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="calificacion" class="form-label">Calificación *</label>
+            <div class="rating-input">
+                <div class="d-flex">
+                    {% for i in "12345" %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="calificacion" id="calificacion{{ forloop.counter }}" 
+                               value="{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                        <label class="form-check-label" for="calificacion{{ forloop.counter }}">
+                            {% for star in "12345" %}
+                                {% if forloop.counter <= forloop.parentloop.counter %}
+                                <i class="fas fa-star {% if forloop.parentloop.counter == 5 %}text-warning{% else %}text-muted{% endif %}"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="curso" class="form-label">Curso relacionado (Opcional)</label>
+            <select class="form-select admin-form-control" id="curso" name="curso">
+                <option value="">-- Sin curso específico --</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.id }}">
+                    {{ curso.nombre }} - {{ curso.nivel|title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="aprobado" name="aprobado" checked>
+                        <label class="form-check-label" for="aprobado">
+                            Aprobado
+                        </label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="destacado" name="destacado">
+                        <label class="form-check-label" for="destacado">
+                            Destacado
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_testimonios' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Testimonio
+        </button>
+    </div>
+</form>
+
+<script>
+// Script para las estrellas (opcional)
+document.querySelectorAll('input[name="calificacion"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.rating-input label').forEach((label, index) => {
+            const stars = label.querySelectorAll('i');
+            stars.forEach((star, starIndex) => {
+                if (starIndex < parseInt(this.value)) {
+                    star.className = 'fas fa-star text-warning';
+                } else {
+                    star.className = 'far fa-star text-muted';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

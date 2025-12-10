@@ -1,0 +1,132 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Pagos{% endblock %}
+{% block page_subtitle %}Historial de transacciones financieras{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_pago' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Pago
+</a>
+{% endblock %}
+
+{% block card_icon %}money-bill-wave{% endblock %}
+{% block card_title %}Lista de Pagos (Total: {{ pagos|length }}){% endblock %}
+
+{% block card_content %}
+{% if pagos %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Referencia</th>
+                <th>Compra / Cliente</th>
+                <th>Fecha</th>
+                <th>Total Pagado</th>
+                <th>Método</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pago in pagos %}
+            <tr>
+                <td>{{ pago.id }}</td>
+                <td>
+                    <!-- CORRECCIÓN: Usamos solo 'referencia', quitamos la variable mala -->
+                    <code>{{ pago.referencia|default:"-"|truncatechars:15 }}</code>
+                </td>
+                <td>
+                    <strong>Compra #{{ pago.compra.id }}</strong><br>
+                    <small class="text-muted">
+                        <i class="fas fa-user"></i> {{ pago.compra.cliente.nombre }}
+                    </small>
+                </td>
+                <td>
+                    {{ pago.fecha_pago|date:"d/m/Y" }}<br>
+                    <small class="text-muted">{{ pago.fecha_pago|date:"H:i" }}</small>
+                </td>
+                <td>
+                    <!-- Suma de Monto + IVA -->
+                    <strong class="text-success" style="font-size: 1.1em;">
+                        ${{ pago.monto|add:pago.iva|floatformat:2 }}
+                    </strong>
+                    <br>
+                    <small class="text-muted" style="font-size: 0.75rem;">
+                        (Sub: ${{ pago.monto }} + IVA: ${{ pago.iva|floatformat:2 }})
+                    </small>
+                </td>
+                <td>
+                    {% if pago.metodo_pago == 'card' %}
+                        <span class="badge bg-primary"><i class="fas fa-credit-card"></i> Tarjeta</span>
+                    {% elif pago.metodo_pago == 'transfer' %}
+                        <span class="badge bg-info text-dark"><i class="fas fa-university"></i> Transferencia</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark border">{{ pago.metodo_pago|default:"Manual" }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if pago.estado_pago == 'aprobado' or pago.estado_pago == 'completado' %}
+                        <span class="badge bg-success">Aprobado</span>
+                    {% elif pago.estado_pago == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif pago.estado_pago == 'rechazado' %}
+                        <span class="badge bg-danger">Rechazado</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ pago.estado_pago }}</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_pago' pago.id %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_pago' pago.id %}" class="btn btn-danger btn-sm btn-confirm-delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Estadísticas -->
+{% if total_recaudado %}
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Total Recaudado</h6>
+                <h4 class="text-success">${{ total_recaudado }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Pagos Hoy</h6>
+                <h4>{{ pagos_hoy }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h6>Aprobados</h6>
+                <h4 class="text-primary">{{ aprobados }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-money-bill-wave"></i>
+    <h4>No hay pagos registrados</h4>
+    <a href="{% url 'agregar_pago' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Registrar Primer Pago
+    </a>
+</div>
+{% endif %}
+{% endblock %}

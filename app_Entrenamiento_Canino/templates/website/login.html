@@ -1,0 +1,402 @@
+<!-- app_Entrenamiento_Canino/templates/website/login.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            padding: 20px;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .login-header h1 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+        
+        .login-header p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0;
+        }
+        
+        .login-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 107, 77, 0.2);
+        }
+        
+        .form-control.error {
+            border-color: var(--color-danger);
+        }
+        
+        .error-message {
+            color: var(--color-danger);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+        }
+        
+        .forgot-password {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-gray-light);
+        }
+        
+        .login-footer p {
+            margin-bottom: 10px;
+            color: var(--color-gray);
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--border-radius);
+            background-color: white;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .social-btn:hover {
+            background-color: var(--color-light);
+        }
+        
+        .social-btn.facebook {
+            color: #1877F2;
+        }
+        
+        .social-btn.google {
+            color: #DB4437;
+        }
+        
+        .back-to-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-primary);
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            color: var(--color-danger);
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            color: var(--color-success);
+        }
+        
+        .alert-info {
+            background-color: rgba(23, 162, 184, 0.1);
+            border: 1px solid rgba(23, 162, 184, 0.2);
+            color: var(--color-info);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--color-gray);
+        }
+        
+        .register-link a {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .admin-access {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .admin-access p {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>CANIS ACADEMIA</h1>
+                <p>Iniciar Sesión</p>
+            </div>
+            
+            <div class="login-body">
+                <!-- Mostrar mensajes de Django -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Formulario de Inicio de Sesión -->
+                <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next|default:'' }}">
+                
+                <!-- CAMBIOS AQUÍ -->
+                <div class="form-group">
+                    <label for="username">Nombre de Usuario</label>
+                    <input type="text" 
+                        id="username" 
+                        name="username"
+                        class="form-control" 
+                        placeholder="Escribe tu usuario (ej: Maria123)" 
+                        required>
+                    <!-- Nota: type="text" permite escribir el usuario sin obligar a poner @ -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Tu contraseña" 
+                        required>
+                </div>
+                
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Recordarme</label>
+                        </div>
+                        <a href="{% url 'password_reset' %}" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
+                        Iniciar Sesión
+                    </button>
+                </form>
+                
+                <!-- Acceso Administrativo -->
+                <div class="admin-access">
+                    <p>
+                        <i class="fas fa-user-shield"></i> Acceso Administrativo
+                    </p>
+                    <a href="/admin/" class="btn btn-outline-dark" style="width: 100%;">
+                        <i class="fas fa-lock"></i> Panel de Administración
+                    </a>
+                    <small style="display: block; margin-top: 8px; color: #6c757d; font-size: 0.8rem;">
+                        Solo para personal autorizado
+                    </small>
+                </div>
+                
+                <div class="register-link">
+                    <p>¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a></p>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn facebook" disabled>
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                    <button type="button" class="social-btn google" disabled>
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </div>
+                
+                <div class="back-to-home">
+                    <a href="{% url 'home' %}">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript específico para login -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.querySelector('form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            // Mostrar mensaje de error si hay en la URL
+            if (window.location.search.includes('error')) {
+                showError(usernameInput, 'Usuario o contraseña incorrectos');
+                showError(passwordInput, 'Usuario o contraseña incorrectos');
+            }
+            
+            // Validación del formulario de inicio de sesión
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    
+                    // Validar Usuario (SOLO QUE NO ESTÉ VACÍO)
+                    if (!usernameInput.value.trim()) {
+                        showError(usernameInput, 'El nombre de usuario es obligatorio');
+                        isValid = false;
+                    } else {
+                        // YA NO validamos si es email o no, solo borramos error
+                        clearError(usernameInput);
+                    }
+                    
+                    // Validar contraseña
+                    if (!passwordInput.value.trim()) {
+                        showError(passwordInput, 'La contraseña es obligatoria');
+                        isValid = false;
+                    } else {
+                        clearError(passwordInput);
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            // Validación en tiempo real (Solo checar que no esté vacío)
+            [usernameInput, passwordInput].forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        showError(this, 'Este campo es obligatorio');
+                    } else {
+                        clearError(this);
+                    }
+                });
+                
+                // Eliminé la validación de email en tiempo real que tenías aquí
+                input.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearError(this);
+                    }
+                });
+            });
+            
+            // Funciones auxiliares
+            function showError(input, message) {
+                clearError(input);
+                input.classList.add('error');
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                input.parentNode.appendChild(errorDiv);
+            }
+            
+            function clearError(input) {
+                input.classList.remove('error');
+                const errorDiv = input.parentNode.querySelector('.error-message');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

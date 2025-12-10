@@ -1,0 +1,82 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Cursos{% endblock %}
+{% block page_subtitle %}Gestión de cursos disponibles{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_curso' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Curso
+</a>
+{% endblock %}
+
+{% block card_icon %}graduation-cap{% endblock %}
+{% block card_title %}Lista de Cursos (Total: {{ cursos|length }}){% endblock %}
+
+{% block card_content %}
+{% if cursos %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Duración</th>
+                <th>Nivel</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for curso in cursos %}
+            <tr>
+                <td>{{ curso.id }}</td>
+                <td>
+                    <strong>{{ curso.nombre }}</strong><br>
+                    <small class="text-muted">{{ curso.descripcion|truncatechars:50 }}</small>
+                </td>
+                <td>${{ curso.precio }}</td>
+                <td>{{ curso.duracion }} horas</td>
+                <td>
+                    <span class="badge 
+                        {% if curso.nivel == 'principiante' %}bg-success
+                        {% elif curso.nivel == 'intermedio' %}bg-warning
+                        {% else %}bg-danger
+                        {% endif %}">
+                        {{ curso.nivel|title }}
+                    </span>
+                </td>
+                <td>
+                    {% if curso.activo %}
+                    <span class="badge bg-success">Activo</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_curso' curso.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_curso' curso.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                    <a href="#" class="btn btn-info btn-sm" title="Ver Detalles">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-graduation-cap"></i>
+    <h4>No hay cursos registrados</h4>
+    <p>Comienza creando tu primer curso.</p>
+    <a href="{% url 'agregar_curso' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Crear Primer Curso
+    </a>
+</div>
+{% endif %}
+{% endblock %}

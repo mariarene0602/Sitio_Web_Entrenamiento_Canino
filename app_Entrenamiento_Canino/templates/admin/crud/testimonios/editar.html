@@ -1,0 +1,139 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Testimonio{% endblock %}
+{% block page_subtitle %}Modificar información del testimonio{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_testimonios' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_testimonio' testimonio.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Testimonio
+</a>
+{% endblock %}
+
+{% block card_icon %}comment-edit{% endblock %}
+{% block card_title %}Editar Testimonio #{{ testimonio.id }}{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'actualizar_testimonio' testimonio.id %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Cliente *</label>
+            <select class="form-select admin-form-control" id="cliente" name="cliente" required disabled>
+                <option value="{{ testimonio.cliente.id }}" selected>
+                    {{ testimonio.cliente.nombre }} {{ testimonio.cliente.apellido }} - {{ testimonio.cliente.email }}
+                </option>
+            </select>
+            <!-- Campo hidden que sí se enviará -->
+            <input type="hidden" name="cliente" value="{{ testimonio.cliente.id }}">
+            <div class="form-text">No se puede cambiar el cliente de un testimonio existente</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="curso" class="form-label">Curso</label>
+            <select class="form-select admin-form-control" id="curso" name="curso">
+                <option value="">Sin curso específico</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.id }}" {% if testimonio.curso and testimonio.curso.id == curso.id %}selected{% endif %}>
+                    {{ curso.nombre }} - {{ curso.nivel|title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="contenido" class="form-label">Testimonio *</label>
+        <textarea class="form-control admin-form-control" id="contenido" name="contenido" rows="5" required>{{ testimonio.contenido }}</textarea>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="calificacion" class="form-label">Calificación *</label>
+            <div class="rating-input">
+                <div class="d-flex">
+                    {% for i in "12345" %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="calificacion" id="calificacion{{ forloop.counter }}" 
+                               value="{{ forloop.counter }}" {% if testimonio.calificacion == forloop.counter %}checked{% endif %}>
+                        <label class="form-check-label" for="calificacion{{ forloop.counter }}">
+                            {% for star in "12345" %}
+                                {% if forloop.counter <= forloop.parentloop.counter %}
+                                <i class="fas fa-star {% if forloop.parentloop.counter <= testimonio.calificacion %}text-warning{% else %}text-muted{% endif %}"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="fecha_creacion" class="form-label">Fecha del Testimonio *</label>
+            <input type="date" class="form-control admin-form-control" id="fecha_creacion" name="fecha_creacion" 
+                   value="{{ testimonio.fecha_creacion|date:'Y-m-d' }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="aprobado" name="aprobado" {% if testimonio.aprobado %}checked{% endif %}>
+                <label class="form-check-label" for="aprobado">
+                    Testimonio aprobado (visible en el sitio)
+                </label>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="destacado" name="destacado" {% if testimonio.destacado %}checked{% endif %}>
+                <label class="form-check-label" for="destacado">
+                    Testimonio destacado (aparece en página principal)
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información del testimonio:</strong><br>
+        Cliente: <strong>{{ testimonio.cliente.nombre }} {{ testimonio.cliente.apellido }}</strong><br>
+        Creado: <strong>{{ testimonio.fecha_creacion|date:"d/m/Y" }}</strong><br>
+        {% if testimonio.curso %}
+        Curso relacionado: <strong>{{ testimonio.curso.nombre }}</strong>
+        {% endif %}
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_testimonios' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+
+<script>
+// Actualizar estrellas en tiempo real
+document.querySelectorAll('input[name="calificacion"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.rating-input label').forEach((label, index) => {
+            const stars = label.querySelectorAll('i');
+            stars.forEach((star, starIndex) => {
+                if (starIndex < parseInt(this.value)) {
+                    star.className = 'fas fa-star text-warning';
+                } else {
+                    star.className = 'far fa-star text-muted';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

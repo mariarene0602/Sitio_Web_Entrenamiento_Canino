@@ -1,0 +1,123 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Agregar Pago{% endblock %}
+{% block page_subtitle %}Nuevo registro de pago{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_pagos' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+{% endblock %}
+
+{% block card_icon %}money-bill-wave{% endblock %}
+{% block card_title %}Formulario de Nuevo Pago{% endblock %}
+
+{% block card_content %}
+<form method="POST" action="{% url 'agregar_pago' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="compra" class="form-label">Compra Asociada *</label>
+            <select class="form-select admin-form-control" id="compra" name="compra" required>
+                <option value="">Seleccionar compra</option>
+                {% for compra in compras %}
+                <option value="{{ compra.id }}" data-monto="{{ compra.monto }}" data-cliente="{{ compra.cliente.nombre }}">
+                    Compra #{{ compra.id }} - {{ compra.cliente.nombre }} - ${{ compra.monto }} - {{ compra.curso.nombre|truncatechars:30 }}
+                </option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Por favor selecciona una compra.</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="monto" class="form-label">Monto ($) *</label>
+            <input type="number" step="0.01" class="form-control admin-form-control" id="monto" name="monto" required>
+            <div class="invalid-feedback">Por favor ingresa el monto.</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="fecha_pago" class="form-label">Fecha de Pago *</label>
+            <input type="datetime-local" class="form-control admin-form-control" id="fecha_pago" name="fecha_pago" 
+                   value="{{ now|date:'Y-m-d\\TH:i' }}" required>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="metodo_pago" class="form-label">Método de Pago *</label>
+            <select class="form-select admin-form-control" id="metodo_pago" name="metodo_pago" required>
+                <option value="">Seleccionar método</option>
+                <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                <option value="tarjeta_debito">Tarjeta de Débito</option>
+                <option value="transferencia">Transferencia Bancaria</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="paypal">PayPal</option>
+                <option value="mercado_pago">Mercado Pago</option>
+                <option value="otros">Otros</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un método de pago.</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="estado_pago" class="form-label">Estado *</label>
+            <select class="form-select admin-form-control" id="estado_pago" name="estado_pago" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="aprobado" selected>Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+                <option value="reembolsado">Reembolsado</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="referencia_pago" class="form-label">Referencia/Comprobante</label>
+            <input type="text" class="form-control admin-form-control" id="referencia_pago" name="referencia_pago"
+                   placeholder="Ej: TRANSFER-12345, Código de operación, etc.">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="banco" class="form-label">Banco/Institución</label>
+            <input type="text" class="form-control admin-form-control" id="banco" name="banco">
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="observaciones" class="form-label">Observaciones</label>
+        <textarea class="form-control admin-form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+    </div>
+    
+    <div class="alert alert-info" id="pago-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información de pago:</strong>
+        <div id="pago-detalle">Selecciona una compra para ver los detalles</div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_pagos' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Pago
+        </button>
+    </div>
+</form>
+
+<script>
+document.getElementById('compra').addEventListener('change', function() {
+    var monto = this.options[this.selectedIndex].getAttribute('data-monto');
+    var cliente = this.options[this.selectedIndex].getAttribute('data-cliente');
+    var montoInput = document.getElementById('monto');
+    var pagoInfo = document.getElementById('pago-detalle');
+    
+    if (monto && cliente) {
+        montoInput.value = parseFloat(monto);
+        pagoInfo.innerHTML = `
+            Cliente: <strong>${cliente}</strong><br>
+            Monto de la compra: <strong>$${parseFloat(monto).toFixed(2)}</strong>
+        `;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,199 @@
+<!-- app_Entrenamiento_Canino/templates/admin/crud/dashboard.html -->
+{% extends "admin/base_panel.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-tachometer-alt"></i> Dashboard de Administración
+        <small class="text-muted">Panel de control principal</small>
+    </h1>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-users"></i> Clientes
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.clientes }}</h2>
+                <a href="{% url 'ver_clientes' %}" class="admin-btn-primary btn-sm">Ver Clientes</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-dog"></i> Perros
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.perros }}</h2>
+                <a href="{% url 'ver_perros' %}" class="admin-btn-primary btn-sm">Ver Perros</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-graduation-cap"></i> Cursos
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.cursos }}</h2>
+                <a href="{% url 'ver_cursos' %}" class="admin-btn-primary btn-sm">Ver Cursos</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-shopping-cart"></i> Compras
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.compras }}</h2>
+                <a href="{% url 'ver_compras' %}" class="admin-btn-primary btn-sm">Ver Compras</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda fila de estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-user-tie"></i> Entrenadores
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.entrenadores }}</h2>
+                <a href="{% url 'ver_entrenadores' %}" class="admin-btn-primary btn-sm">Ver Entrenadores</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-tag"></i> Ofertas
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.ofertas }}</h2>
+                <a href="{% url 'ver_ofertas' %}" class="admin-btn-primary btn-sm">Ver Ofertas</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-money-bill-wave"></i> Pagos
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.pagos }}</h2>
+                <a href="{% url 'ver_pagos' %}" class="admin-btn-primary btn-sm">Ver Pagos</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-calendar-check"></i> Testimonios
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ stats.testimonios }}</h2>
+                <a href="{% url 'ver_testimonios' %}" class="admin-btn-primary btn-sm">Ver Testimonios</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-bolt"></i> Acciones Rápidas
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{% url 'agregar_cliente' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-plus me-2"></i>Agregar Nuevo Cliente
+                    </a>
+                    <a href="{% url 'agregar_curso' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Curso
+                    </a>
+                    <a href="{% url 'agregar_perro' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-paw me-2"></i>Registrar Nuevo Perro
+                    </a>
+                    <a href="{% url 'agregar_entrenador' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-tie me-2"></i>Agregar Entrenador
+                    </a>
+                    <a href="{% url 'admin:index' %}" target="_blank" class="list-group-item list-group-item-action">
+                        <i class="fas fa-external-link-alt me-2"></i>Ir a Django Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <i class="fas fa-chart-line"></i> Estadísticas Recientes
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-money-bill-wave text-success me-2"></i> Ingresos del mes: <strong>${{ stats.ingresos_mes }}</strong></li>
+                    <li class="mb-2"><i class="fas fa-user-plus text-primary me-2"></i> Nuevos clientes (30 días): <strong>{{ stats.nuevos_clientes }}</strong></li>
+                    <li class="mb-2"><i class="fas fa-shopping-cart text-warning me-2"></i> Compras pendientes: <strong>{{ stats.compras_pendientes }}</strong></li>
+                    <li class="mb-2"><i class="fas fa-calendar-check text-info me-2"></i> Citas hoy: <strong>{{ stats.citas_hoy }}</strong></li>
+                    <li class="mb-2"><i class="fas fa-comment text-purple me-2"></i> Testimonios pendientes: <strong>{{ stats.testimonios_pendientes }}</strong></li>
+                    <li class="mb-2"><i class="fas fa-tag text-danger me-2"></i> Ofertas activas: <strong>{{ stats.ofertas_activas }}</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad Reciente -->
+<div class="admin-card mt-4">
+    <div class="admin-card-header">
+        <i class="fas fa-history"></i> Actividad Reciente
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for actividad in actividades %}
+                    <tr>
+                        <td>{{ actividad.fecha|date:"d/m/Y H:i" }}</td>
+                        <td><span class="badge bg-{{ actividad.tipo_color }}">{{ actividad.tipo }}</span></td>
+                        <td>{{ actividad.descripcion }}</td>
+                        <td>{{ actividad.usuario }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle"></i> No hay actividad reciente
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,744 @@
+<!-- app_Entrenamiento_Canino/templates/website/comprar-curso.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Curso - CANIS Academia</title>
+    
+    <!-- Tus estilos (ruta Django) -->
+    <link rel="stylesheet" href="{% static 'website/css/styles.css' %}">
+    
+    <!-- Fuentes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+
+    /* CORRECCIÓN DE DISEÑO PARA LA SELECCIÓN DE CURSO */
+    .course-option-content {
+        display: grid;
+        /* Hacemos 3 columnas: Imagen pequeña | Texto | Precio y Botón */
+        grid-template-columns: 150px 1fr auto; 
+        gap: 20px;
+        align-items: center;
+        text-align: left;
+    }
+
+    /* Forzamos la imagen a ser pequeña en esta pantalla */
+    .course-option .course-image {
+        width: 150px !important;
+        height: 100px !important;
+        border-radius: 8px;
+    }
+
+    .course-details h4 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: #2c3e50;
+    }
+
+    /* En móviles, volvemos a ponerlo uno debajo del otro */
+    @media (max-width: 768px) {
+        .course-option-content {
+            grid-template-columns: 1fr; /* Una sola columna */
+            text-align: center;
+        }
+        
+        .course-option .course-image {
+            width: 100% !important;
+            height: 200px !important; /* Un poco más grande en celular */
+            margin: 0 auto;
+        }
+        
+        .course-price {
+            text-align: center;
+            margin-top: 10px;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <!-- Navbar Django -->
+    {% include 'website/partials/navbar.html' %}
+
+    <main class="content-main">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">COMPRAR CURSO</h1>
+                <p class="page-subtitle">Inscríbete en nuestro programa de entrenamiento y transforma la vida de tu perro.</p>
+                <div class="breadcrumb">
+                    <a href="{% url 'home' %}">Inicio</a> / <span>Comprar Curso</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="purchase-section">
+            <div class="container">
+                <div class="purchase-grid">
+                    <div class="purchase-form-container">
+                        <div class="form-steps">
+                            <div class="step active" data-step="1">
+                                <span class="step-number">1</span>
+                                <span class="step-label">Seleccionar Curso</span>
+                            </div>
+                            <div class="step" data-step="2">
+                                <span class="step-number">2</span>
+                                <span class="step-label">Datos del Perro</span>
+                            </div>
+                            <div class="step" data-step="3">
+                                <span class="step-number">3</span>
+                                <span class="step-label">Pago</span>
+                            </div>
+                            <div class="step" data-step="4">
+                                <span class="step-number">4</span>
+                                <span class="step-label">Confirmación</span>
+                            </div>
+                        </div>
+
+                        <!-- Paso 1: Selección de Curso -->
+                        <div class="form-step active" id="step-1">
+                            <h2>Selecciona tu Curso</h2>
+                            <div class="courses-selection" id="courses-selection">
+                                <!-- CURSOS DINÁMICOS DE DJANGO -->
+                                {% for curso in cursos %}
+                                <div class="course-option" data-id="{{ curso.id }}">
+                                    <div class="course-option-content">
+                                        <div class="course-image">
+                                            {% if curso.imagen %}
+                                                <img src="{{ curso.imagen.url }}" 
+                                                     alt="{{ curso.nombre }}"
+                                                     onerror="this.onerror=null; this.src='{% static 'website/images/default-course.jpg' %}'">
+                                            {% else %}
+                                                <img src="{% static 'website/images/default-course.jpg' %}" 
+                                                     alt="{{ curso.nombre }}">
+                                            {% endif %}
+                                        </div>
+                                        <div class="course-details">
+                                            <h4>{{ curso.nombre }}</h4>
+                                            <p class="course-description">{{ curso.descripcion|truncatewords:30 }}</p>
+                                            <div class="course-meta">
+                                                <span class="duration"><i class="fas fa-clock"></i> {{ curso.duracion }}</span>
+                                                <span class="level"><i class="fas fa-chart-line"></i> {{ curso.nivel }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="course-price">
+                                            <span class="price">${{ curso.precio }} MXN</span>
+                                            <button class="btn btn-outline select-course" data-id="{{ curso.id }}">Seleccionar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="no-courses">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <h3>No hay cursos disponibles</h3>
+                                    <p>Por favor, contacta con nosotros para más información.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="step-actions">
+                                <button class="btn btn-primary next-step" data-next="2">Continuar</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Datos del Perro -->
+                        <div class="form-step" id="step-2">
+                            <h2>Información de tu Perro</h2>
+                            <form id="dog-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="dog-name">Nombre del Perro *</label>
+                                        <input type="text" id="dog-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dog-breed">Raza *</label>
+                                        <input type="text" id="dog-breed" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="dog-age">Edad (meses) *</label>
+                                        <input type="number" id="dog-age" min="1" max="240" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dog-weight">Peso (kg) *</label>
+                                        <input type="number" id="dog-weight" min="1" max="100" step="0.1" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="dog-sex">Sexo *</label>
+                                        <select id="dog-sex" required>
+                                            <option value="">Seleccionar</option>
+                                            <option value="Macho">Macho</option>
+                                            <option value="Hembra">Hembra</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dog-size">Tamaño *</label>
+                                        <select id="dog-size" required>
+                                            <option value="">Seleccionar</option>
+                                            <option value="pequeño">Pequeño (1-10 kg)</option>
+                                            <option value="mediano">Mediano (11-25 kg)</option>
+                                            <option value="grande">Grande (26-45 kg)</option>
+                                            <option value="gigante">Gigante (46+ kg)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dog-behavior">Comportamiento Actual *</label>
+                                    <textarea id="dog-behavior" rows="4" placeholder="Describe el comportamiento actual de tu perro, cualquier problema específico o comportamiento que quieras mejorar..." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dog-experience">Experiencia Previa con Entrenamiento</label>
+                                    <textarea id="dog-experience" rows="3" placeholder="¿Tu perro ha recibido entrenamiento anteriormente? Describe la experiencia..."></textarea>
+                                </div>
+                            </form>
+                            <div class="step-actions">
+                                <button class="btn btn-outline prev-step" data-prev="1">Anterior</button>
+                                <button class="btn btn-primary next-step" data-next="3">Continuar</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 3: Pago -->
+                        <div class="form-step" id="step-3">
+                            <h2>Método de Pago</h2>
+                            <div class="payment-methods">
+                                <div class="payment-method active" data-method="card">
+                                    <div class="method-header">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>Tarjeta de Crédito/Débito</span>
+                                    </div>
+                                    <div class="method-content">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="card-number">Número de Tarjeta *</label>
+                                                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="card-name">Nombre en la Tarjeta *</label>
+                                                <input type="text" id="card-name" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="card-expiry">Fecha de Expiración *</label>
+                                                <input type="text" id="card-expiry" placeholder="MM/AA" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="card-cvv">CVV *</label>
+                                                <input type="text" id="card-cvv" placeholder="123" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="payment-method" data-method="transfer">
+                                    <div class="method-header">
+                                        <i class="fas fa-university"></i>
+                                        <span>Transferencia Bancaria</span>
+                                    </div>
+                                    <div class="method-content">
+                                        <p>Realiza tu transferencia a la siguiente cuenta:</p>
+                                        <div class="bank-details">
+                                            <p><strong>Banco:</strong> BBVA</p>
+                                            <p><strong>Cuenta:</strong> 0123 4567 8901 2345</p>
+                                            <p><strong>CLABE:</strong> 012 345 6789 0123 4567 8</p>
+                                            <p><strong>Beneficiario:</strong> CANIS ACADEMIA S.A. de C.V.</p>
+                                        </div>
+                                        <p class="note">Una vez realizada la transferencia, envía tu comprobante a pagos@canisacademia.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="coupon-section">
+                                <label for="coupon-code">¿Tienes un código de descuento?</label>
+                                <div class="coupon-input">
+                                    <input type="text" id="coupon-code" placeholder="Ingresa tu código">
+                                    <button class="btn btn-outline" id="apply-coupon">Aplicar</button>
+                                </div>
+                                <div id="coupon-message"></div>
+                            </div>
+                            <div class="step-actions">
+                                <button class="btn btn-outline prev-step" data-prev="2">Anterior</button>
+                                <button class="btn btn-primary" id="complete-purchase">Completar Compra</button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 4: Confirmación -->
+                        <div class="form-step" id="step-4">
+                            <div class="confirmation-content">
+                                <div class="confirmation-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h2>¡Compra Exitosa!</h2>
+                                <p>Tu curso ha sido reservado exitosamente. Hemos enviado los detalles a tu correo electrónico.</p>
+                                
+                                <div class="order-summary">
+                                    <h3>Resumen de tu Orden</h3>
+                                    <div class="order-details" id="order-details">
+                                        <!-- Los detalles se llenarán dinámicamente -->
+                                    </div>
+                                </div>
+                                
+                                <div class="next-steps">
+                                    <h3>Próximos Pasos</h3>
+                                    <ul>
+                                        <li>Recibirás un email de confirmación con los detalles del curso</li>
+                                        <li>Nuestro equipo se pondrá en contacto en 24 horas para coordinar horarios</li>
+                                        <li>Prepara los documentos de vacunación de tu perro</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="confirmation-actions">
+                                    <a href="{% url 'home' %}" class="btn btn-primary">Volver al Inicio</a>
+                                    <a href="{% url 'perfil' %}" class="btn btn-outline">Ver Mis Cursos</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-summary-sidebar">
+                        <div class="summary-card">
+                            <h3>Resumen del Pedido</h3>
+                            <div class="summary-content" id="summary-content">
+                                <div class="empty-summary">
+                                    <p>Selecciona un curso para ver el resumen</p>
+                                </div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="total-line">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal">$0.00</span>
+                                </div>
+                                <div class="total-line discount" id="discount-line" style="display: none;">
+                                    <span>Descuento:</span>
+                                    <span id="discount-amount">-$0.00</span>
+                                </div>
+                                <div class="total-line">
+                                    <span>IVA (16%):</span>
+                                    <span id="iva-amount">$0.00</span>
+                                </div>
+                                <div class="total-line total">
+                                    <span>Total:</span>
+                                    <span id="total-amount">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="support-card">
+                            <div class="support-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h4>¿Necesitas ayuda?</h4>
+                            <p>Nuestro equipo está aquí para ayudarte con cualquier duda sobre los cursos.</p>
+                            <div class="support-contact">
+                                <p><i class="fas fa-phone"></i> (55) 1234-5678</p>
+                                <p><i class="fas fa-envelope"></i> info@canisacademia.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer Django -->
+    {% include 'website/partials/footer.html' %}
+
+    <!-- Tu JavaScript (ruta Django) -->
+    <script src="{% static 'website/js/scripts.js' %}"></script>
+    
+    <!-- JavaScript específico para compra de cursos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario está autenticado
+            {% if not user.is_authenticated %}
+                alert('Debes iniciar sesión para comprar un curso');
+                window.location.href = "{% url 'login' %}?next={% url 'comprar_curso' %}";
+            {% endif %}
+
+            let selectedCourse = null;
+            let appliedDiscount = 0;
+            let discountCode = '';
+            
+            // Obtener cursos de Django
+            const cursosData = [
+                {% for curso in cursos %}
+                {
+                    id: {{ curso.id }},
+                    nombre: "{{ curso.nombre|escapejs }}",
+                    descripcion: "{{ curso.descripcion|escapejs }}",
+                    precio: {{ curso.precio }},
+                    duracion: "{{ curso.duracion|escapejs }}",
+                    nivel: "{{ curso.nivel|escapejs }}",
+                    imagen: "{% if curso.imagen %}{{ curso.imagen.url }}{% else %}{% static 'website/images/default-course.jpg' %}{% endif %}",
+                    selected: false
+                },
+                {% endfor %}
+            ];
+
+            // Códigos de descuento válidos
+            const discountCodes = {
+                'BIENVENIDO10': 10,
+                'FAMILIA15': 15,
+                'AVANZADO25': 25,
+                'TERAPIA30': 30,
+                'ONLINE15': 15
+            };
+
+            // Inicializar proceso de compra
+            initializePurchaseProcess();
+
+            function initializePurchaseProcess() {
+                setupEventListeners();
+                checkUrlParameters();
+                preSelectCourseFromUrl();
+            }
+
+            function setupEventListeners() {
+                // Selección de cursos
+                document.querySelectorAll('.select-course').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const courseId = parseInt(this.getAttribute('data-id'));
+                        selectCourse(courseId);
+                    });
+                });
+
+                // Navegación entre pasos
+                document.querySelectorAll('.next-step').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const nextStep = this.getAttribute('data-next');
+                        goToStep(nextStep);
+                    });
+                });
+
+                document.querySelectorAll('.prev-step').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const prevStep = this.getAttribute('data-prev');
+                        goToStep(prevStep);
+                    });
+                });
+
+                // Métodos de pago
+                document.querySelectorAll('.payment-method').forEach(method => {
+                    method.querySelector('.method-header').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.payment-method').forEach(m => {
+                            m.classList.remove('active');
+                        });
+                        method.classList.add('active');
+                    });
+                });
+
+                // Aplicar cupón
+                document.getElementById('apply-coupon').addEventListener('click', applyCoupon);
+
+                // Completar compra
+                document.getElementById('complete-purchase').addEventListener('click', completePurchase);
+            }
+
+            function selectCourse(courseId) {
+                selectedCourse = cursosData.find(c => c.id === courseId);
+                
+                // Actualizar UI
+                document.querySelectorAll('.course-option').forEach(option => {
+                    option.classList.remove('selected');
+                    if (parseInt(option.getAttribute('data-id')) === courseId) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                updateOrderSummary();
+            }
+
+            function updateOrderSummary() {
+                const summaryContent = document.getElementById('summary-content');
+                const subtotalElement = document.getElementById('subtotal');
+                const ivaElement = document.getElementById('iva-amount');
+                const totalElement = document.getElementById('total-amount');
+                const discountLine = document.getElementById('discount-line');
+                const discountAmount = document.getElementById('discount-amount');
+
+                if (!selectedCourse) {
+                    summaryContent.innerHTML = `
+                        <div class="empty-summary">
+                            <p>Selecciona un curso para ver el resumen</p>
+                        </div>
+                    `;
+                    subtotalElement.textContent = '$0.00';
+                    ivaElement.textContent = '$0.00';
+                    totalElement.textContent = '$0.00';
+                    discountLine.style.display = 'none';
+                    return;
+                }
+
+                const subtotal = selectedCourse.precio;
+                const discount = (subtotal * appliedDiscount) / 100;
+                const iva = (subtotal - discount) * 0.16;
+                const total = subtotal - discount + iva;
+
+                summaryContent.innerHTML = `
+                    <div class="selected-course">
+                        <h4>${selectedCourse.nombre}</h4>
+                        <p>Duración: ${selectedCourse.duracion}</p>
+                        <p>Nivel: ${selectedCourse.nivel}</p>
+                    </div>
+                `;
+
+                subtotalElement.textContent = formatPrice(subtotal);
+                ivaElement.textContent = formatPrice(iva);
+                totalElement.textContent = formatPrice(total);
+
+                if (appliedDiscount > 0) {
+                    discountLine.style.display = 'flex';
+                    discountAmount.textContent = `-${formatPrice(discount)}`;
+                } else {
+                    discountLine.style.display = 'none';
+                }
+            }
+
+            function formatPrice(price) {
+                return new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN'
+                }).format(price);
+            }
+
+            function goToStep(stepNumber) {
+                // Validar paso actual antes de avanzar
+                const currentStep = document.querySelector('.form-step.active');
+                const currentStepNumber = currentStep.id.split('-')[1];
+
+                if (stepNumber > currentStepNumber) {
+                    if (!validateStep(currentStepNumber)) {
+                        alert('Por favor completa todos los campos requeridos');
+                        return;
+                    }
+                }
+
+                // Ocultar todos los pasos
+                document.querySelectorAll('.form-step').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Mostrar paso seleccionado
+                document.getElementById(`step-${stepNumber}`).classList.add('active');
+
+                // Actualizar indicadores de pasos
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                    if (parseInt(step.getAttribute('data-step')) <= stepNumber) {
+                        step.classList.add('active');
+                    }
+                });
+
+                // Si vamos al paso 4, mostrar resumen final
+                if (stepNumber === '4') {
+                    showOrderConfirmation();
+                }
+            }
+
+            function validateStep(stepNumber) {
+                switch(stepNumber) {
+                    case '1':
+                        if (!selectedCourse) {
+                            alert('Por favor selecciona un curso');
+                            return false;
+                        }
+                        return true;
+                    case '2':
+                        return validateDogForm();
+                    case '3':
+                        return validatePaymentForm();
+                    default:
+                        return true;
+                }
+            }
+
+            function validateDogForm() {
+                const requiredFields = ['dog-name', 'dog-breed', 'dog-age', 'dog-weight', 'dog-sex', 'dog-size', 'dog-behavior'];
+                let isValid = true;
+
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (!field.value.trim()) {
+                        field.classList.add('error');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error');
+                    }
+                });
+
+                return isValid;
+            }
+
+            function validatePaymentForm() {
+                const selectedMethod = document.querySelector('.payment-method.active').getAttribute('data-method');
+                
+                if (selectedMethod === 'card') {
+                    const cardFields = ['card-number', 'card-name', 'card-expiry', 'card-cvv'];
+                    let isValid = true;
+
+                    cardFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (!field.value.trim()) {
+                            field.classList.add('error');
+                            isValid = false;
+                        } else {
+                            field.classList.remove('error');
+                        }
+                    });
+
+                    return isValid;
+                }
+
+                return true; // Transferencia no requiere validación adicional
+            }
+
+            function applyCoupon() {
+                const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
+                const messageElement = document.getElementById('coupon-message');
+
+                if (!couponCode) {
+                    messageElement.innerHTML = '<span class="error">Ingresa un código de descuento</span>';
+                    return;
+                }
+
+                if (discountCodes[couponCode]) {
+                    appliedDiscount = discountCodes[couponCode];
+                    discountCode = couponCode;
+                    messageElement.innerHTML = `<span class="success">¡Código aplicado! ${appliedDiscount}% de descuento</span>`;
+                    updateOrderSummary();
+                } else {
+                    appliedDiscount = 0;
+                    discountCode = '';
+                    messageElement.innerHTML = '<span class="error">Código inválido o expirado</span>';
+                    updateOrderSummary();
+                }
+            }
+
+            function completePurchase() {
+                if (!validateStep('3')) {
+                    alert('Por favor completa todos los campos de pago');
+                    return;
+                }
+
+                // Enviar datos al servidor Django
+                const formData = new FormData();
+                formData.append('course_id', selectedCourse.id);
+                formData.append('dog_name', document.getElementById('dog-name').value);
+                formData.append('dog_breed', document.getElementById('dog-breed').value);
+                formData.append('dog_age', document.getElementById('dog-age').value);
+                formData.append('dog_weight', document.getElementById('dog-weight').value);
+                formData.append('dog_sex', document.getElementById('dog-sex').value);
+                formData.append('dog_size', document.getElementById('dog-size').value);
+                formData.append('dog_behavior', document.getElementById('dog-behavior').value);
+                formData.append('dog_experience', document.getElementById('dog-experience').value);
+                formData.append('payment_method', document.querySelector('.payment-method.active').getAttribute('data-method'));
+                formData.append('discount_code', discountCode);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                // Mostrar carga
+                document.getElementById('complete-purchase').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                document.getElementById('complete-purchase').disabled = true;
+
+                // Enviar petición AJAX
+                fetch("{% url 'procesar_compra' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Ir al paso de confirmación
+                        goToStep('4');
+                    } else {
+                        alert(data.error || 'Hubo un error al procesar la compra');
+                        document.getElementById('complete-purchase').innerHTML = 'Completar Compra';
+                        document.getElementById('complete-purchase').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Hubo un error al procesar la compra');
+                    document.getElementById('complete-purchase').innerHTML = 'Completar Compra';
+                    document.getElementById('complete-purchase').disabled = false;
+                });
+            }
+
+            function showOrderConfirmation() {
+                const orderDetails = document.getElementById('order-details');
+                const subtotal = selectedCourse.precio;
+                const discount = (subtotal * appliedDiscount) / 100;
+                const iva = (subtotal - discount) * 0.16;
+                const total = subtotal - discount + iva;
+
+                orderDetails.innerHTML = `
+                    <div class="order-item">
+                        <strong>Curso:</strong>
+                        <span>${selectedCourse.nombre}</span>
+                    </div>
+                    <div class="order-item">
+                        <strong>Perro:</strong>
+                        <span>${document.getElementById('dog-name').value} (${document.getElementById('dog-breed').value})</span>
+                    </div>
+                    <div class="order-item">
+                        <strong>Fecha de Inicio:</strong>
+                        <span>${new Date().toLocaleDateString('es-MX')}</span>
+                    </div>
+                    <div class="order-item">
+                        <strong>Subtotal:</strong>
+                        <span>${formatPrice(subtotal)}</span>
+                    </div>
+                    ${appliedDiscount > 0 ? `
+                    <div class="order-item">
+                        <strong>Descuento:</strong>
+                        <span>-${formatPrice(discount)} (${appliedDiscount}%)</span>
+                    </div>
+                    ` : ''}
+                    <div class="order-item">
+                        <strong>IVA (16%):</strong>
+                        <span>${formatPrice(iva)}</span>
+                    </div>
+                    <div class="order-item total">
+                        <strong>Total:</strong>
+                        <span>${formatPrice(total)}</span>
+                    </div>
+                `;
+            }
+
+            function checkUrlParameters() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
+                const offerId = urlParams.get('oferta');
+
+                return { courseId, offerId };
+            }
+
+            function preSelectCourseFromUrl() {
+                const { courseId } = checkUrlParameters();
+                if (courseId) {
+                    // Esperar un momento para que se carguen los cursos
+                    setTimeout(() => {
+                        const courseOption = document.querySelector(`.course-option[data-id="${courseId}"]`);
+                        if (courseOption) {
+                            courseOption.querySelector('.select-course').click();
+                        }
+                    }, 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

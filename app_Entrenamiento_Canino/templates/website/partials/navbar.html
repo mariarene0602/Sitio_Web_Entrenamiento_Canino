@@ -1,0 +1,74 @@
+<!-- app_Entrenamiento_Canino/templates/website/partials/navbar.html -->
+{% load static %}
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                <h1>CANIS</h1>
+                <span>ACADEMIA</span>
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li>
+                    <a href="{% url 'home' %}" 
+                       class="{% if request.resolver_match.url_name == 'home' %}active-link{% endif %}">
+                        INICIO
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'cursos' %}" 
+                       class="{% if request.resolver_match.url_name == 'cursos' %}active-link{% endif %}">
+                        CURSOS
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ofertas' %}" 
+                       class="{% if request.resolver_match.url_name == 'ofertas' %}active-link{% endif %}">
+                        OFERTAS
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'testimonios' %}" 
+                       class="{% if request.resolver_match.url_name == 'testimonios' %}active-link{% endif %}">
+                        TESTIMONIOS
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'comprar_curso' %}" 
+                       class="{% if request.resolver_match.url_name == 'comprar_curso' %}active-link{% endif %}">
+                        COMPRAR CURSO
+                    </a>
+                </li>
+                
+                {% if user.is_authenticated %}
+                    <!-- Usuario autenticado -->
+                    <li style="display: flex; align-items: center; margin-right: 15px; font-weight: bold; color: #4A6FA5;">
+                        Hola, {{ user.first_name|default:user.username }}
+                    </li>
+
+                    <li class="login-item">
+                        <a href="{% url 'perfil' %}" class="nav-login-button">
+                            <i class="fas fa-user"></i> MI CUENTA
+                        </a>
+                    </li>
+                    <li class="login-item">
+                        <a href="{% url 'logout' %}" class="nav-login-button" style="background-color: #dc3545;">
+                            <i class="fas fa-sign-out-alt"></i> SALIR
+                        </a>
+                    </li>
+                {% else %}
+                    <!-- Usuario NO autenticado -->
+                    <li class="login-item">
+                        <a href="{% url 'login' %}" class="nav-login-button">
+                            <i class="fas fa-user"></i> INICIAR SESIÓN
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</header>

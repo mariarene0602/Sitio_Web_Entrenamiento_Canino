@@ -1,0 +1,107 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Clientes{% endblock %}
+{% block page_subtitle %}Gestión de clientes registrados{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'agregar_cliente' %}" class="admin-btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Cliente
+</a>
+<!-- Enlace corregido para evitar errores si no usas el admin original frecuentemente -->
+<a href="{% url 'admin:index' %}" class="admin-btn-warning" target="_blank">
+    <i class="fas fa-external-link-alt"></i> Ver en Django Admin
+</a>
+{% endblock %}
+
+{% block card_icon %}users{% endblock %}
+{% block card_title %}Lista de Clientes (Total: {{ clientes|length }}){% endblock %}
+
+{% block card_content %}
+{% if clientes %}
+<div class="table-responsive">
+    <table class="table admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Correo Electrónico</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.id }}</td>
+                <td>
+                    <strong>{{ cliente.nombre }} {{ cliente.apellido }}</strong><br>
+                    <!-- CORREGIDO: Es 'usuario', no 'user' -->
+                    <small class="text-muted">
+                        <i class="fas fa-user-circle"></i> {{ cliente.usuario.username|default:"Sin usuario web" }}
+                    </small>
+                </td>
+                <td>
+                    <!-- CORREGIDO: Es 'correo', no 'email' -->
+                    {{ cliente.correo|default:"-" }}
+                </td>
+                <td>
+                    <!-- Si está vacío, muestra un guion -->
+                    {{ cliente.telefono|default:"-" }}
+                </td>
+                <td>
+                    {{ cliente.direccion|default:"-" }}
+                </td>
+                <td>{{ cliente.fecha_registro|date:"d/m/Y" }}</td>
+                
+                <td class="action-buttons">
+                    <a href="{% url 'actualizar_cliente' cliente.id %}" class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'borrar_cliente' cliente.id %}" class="btn btn-danger btn-sm btn-confirm-delete" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginación -->
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-users"></i>
+    <h4>No hay clientes registrados</h4>
+    <p>Los usuarios que se registren en la web aparecerán aquí.</p>
+    <a href="{% url 'agregar_cliente' %}" class="admin-btn-primary">
+        <i class="fas fa-plus"></i> Agregar Manualmente
+    </a>
+</div>
+{% endif %}
+{% endblock %}

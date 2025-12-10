@@ -1,0 +1,80 @@
+{% extends "admin/crud/base_crud.html" %}
+
+{% block page_title %}Editar Cliente{% endblock %}
+{% block page_subtitle %}Modificar información del cliente{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'ver_clientes' %}" class="admin-btn-warning">
+    <i class="fas fa-arrow-left"></i> Volver a la Lista
+</a>
+<a href="{% url 'borrar_cliente' cliente.id %}" class="admin-btn-danger btn-confirm-delete">
+    <i class="fas fa-trash"></i> Eliminar Cliente
+</a>
+{% endblock %}
+
+{% block card_icon %}user-edit{% endblock %}
+{% block card_title %}Editar Cliente: {{ cliente.nombre }} {{ cliente.apellido }}{% endblock %}
+
+{% block card_content %}
+<!-- CORRECCIÓN: Action apunta a la URL correcta -->
+<form method="POST" action="{% url 'actualizar_cliente' cliente.id %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input type="text" class="form-control admin-form-control" id="nombre" name="nombre" 
+                   value="{{ cliente.nombre }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="apellido" class="form-label">Apellido *</label>
+            <input type="text" class="form-control admin-form-control" id="apellido" name="apellido"
+                   value="{{ cliente.apellido }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="correo" class="form-label">Correo Electrónico *</label>
+            <!-- CORRECCIÓN IMPORTANTE: name="correo" y value="{{ cliente.correo }}" -->
+            <input type="email" class="form-control admin-form-control" id="correo" name="correo"
+                   value="{{ cliente.correo }}" required>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="tel" class="form-control admin-form-control" id="telefono" name="telefono"
+                   value="{{ cliente.telefono|default:'' }}">
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección</label>
+        <textarea class="form-control admin-form-control" id="direccion" name="direccion" rows="3">{{ cliente.direccion|default:'' }}</textarea>
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">Información Adicional</label>
+        <div class="form-text">
+            <!-- CORRECCIÓN: cliente.usuario.username -->
+            <p><strong>Usuario Web:</strong> {{ cliente.usuario.username|default:"No vinculado" }}</p>
+            <p><strong>Registrado desde:</strong> {{ cliente.fecha_registro|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Si cambias el correo aquí, asegúrate de avisar al cliente.
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'ver_clientes' %}" class="admin-btn-warning">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit" class="admin-btn-primary">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}
